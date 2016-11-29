@@ -20,9 +20,51 @@
  */
 class select extends OnePiece
 {
-	static function Get($args)
+	/**
+	 * Get select sql statement.
+	 *
+	 * @param  array $args
+	 * @param  db $db
+	 * @return string
+	 */
+	static function Get($args, $db=null)
 	{
-		$table = $args['table'];
-		return "SELECT * FROM $table";
+		//	TABLE
+		if( $table = ifset($args['table']) ){
+			$table = $db->Quote($table);
+		}else{
+			Notice::Set("Has not been set table name.");
+			return false;
+		}
+
+		//	COLUMN
+		if(!$column = self::_column($args, $db)){
+			return false;
+		}
+
+		return "SELECT {$column} FROM {$table}";
+	}
+
+	/**
+	 * Get column string.
+	 *
+	 * @param  array $args
+	 * @param  PDO $pdo
+	 * @return string
+	 */
+	static private function _column($args, $pdo)
+	{
+		if( $column = ifset($args['column']) ){
+			if( is_string($column) ){
+				$column = explode(',', $column);
+			}
+			foreach($column as $key => $val){
+				$join[] = $pdo->quote(trim($val));
+			}
+			$result = join(', ', $join);
+		}else{
+			$result = '*';
+		}
+		return $result;
 	}
 }

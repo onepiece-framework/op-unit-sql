@@ -21,6 +21,13 @@
 class sql extends OnePiece
 {
 	/**
+	 * Database unit.
+	 *
+	 * @var db
+	 */
+	private $_db;
+
+	/**
 	 * Generate delete sql statement.
 	 *
 	 * @param  array $args
@@ -50,7 +57,17 @@ class sql extends OnePiece
 	 */
 	function Select($args)
 	{
-		return select::Get($args);
+		return select::Get($args, $this->_db);
+	}
+
+	/**
+	 * Set database unit object.
+	 *
+	 * @param db $db
+	 */
+	function SetDatabase($db)
+	{
+		$this->_db = $db;
 	}
 
 	/**
