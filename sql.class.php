@@ -78,6 +78,6 @@ class sql extends OnePiece
 	 */
 	function Update($args)
 	{
-		return update::Get($args);
+		return update::Get($args, $this->_db);
 	}
 }
