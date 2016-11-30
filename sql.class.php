@@ -35,7 +35,7 @@ class sql extends OnePiece
 	 */
 	function Delete($args)
 	{
-		return delete::Get($args);
+		return delete::Get($args, $this->_db);
 	}
 
 	/**
