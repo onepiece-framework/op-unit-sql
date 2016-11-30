@@ -39,14 +39,27 @@ class select extends OnePiece
 
 		//	COLUMN
 		if(!$column = self::_column($args, $db)){
+			Notice::Set("Has not been set column. (SELECT ? FROM $table)");
 			return false;
 		}
 
-		return "SELECT {$column} FROM {$table}";
+		//	WHERE
+		if(!$where = _where::Get($args, $db) ){
+			Notice::Set("Has not been set where condition. (SELECT $column FROM $table)");
+			return false;
+		}
+
+		//	LIMIT
+		if(!$limit = self::_limit($args)){
+			Notice::Set("Has not been set limit condition. (SELECT $column FROM $table WHERE {$where})");
+			return false;
+		}
+
+		return "SELECT {$column} FROM {$table} WHERE {$where} LIMIT {$limit}";
 	}
 
 	/**
-	 * Get column string.
+	 * Get column condition.
 	 *
 	 * @param  array $args
 	 * @param  PDO $pdo
@@ -66,5 +79,14 @@ class select extends OnePiece
 			$result = '*';
 		}
 		return $result;
+	}
+
+	/**
+	 * Get limit condition.
+	 *
+	 */
+	static function _limit($args)
+	{
+		return ifset($args['limit']);
 	}
 }
