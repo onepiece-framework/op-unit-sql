@@ -30,32 +30,29 @@ class select extends OnePiece
 	static function Get($args, $db=null)
 	{
 		//	TABLE
-		if( $table = ifset($args['table']) ){
-			$table = $db->Quote($table);
-		}else{
-			Notice::Set("Has not been set table name.");
+		if(!$table = dml::table($args, $db) ){
 			return false;
 		}
 
 		//	COLUMN
 		if(!$column = self::_column($args, $db)){
-			Notice::Set("Has not been set column. (SELECT ? FROM $table)");
 			return false;
 		}
 
 		//	WHERE
-		if(!$where = _where::Get($args, $db) ){
-			Notice::Set("Has not been set where condition. (SELECT $column FROM $table)");
+		if(!$where = dml::where($args, $db) ){
 			return false;
 		}
 
 		//	LIMIT
-		if(!$limit = self::_limit($args)){
-			Notice::Set("Has not been set limit condition. (SELECT $column FROM $table WHERE {$where})");
+		if(!$limit = dml::limit($args, $db)){
 			return false;
 		}
 
-		return "SELECT {$column} FROM {$table} WHERE {$where} LIMIT {$limit}";
+		//	OFFSET
+		$offset = dml::offset($args, $db);
+
+		return "SELECT {$column} FROM {$table} WHERE {$where} LIMIT {$limit} OFFSET {$offset}";
 	}
 
 	/**

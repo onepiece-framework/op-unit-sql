@@ -38,28 +38,11 @@ class insert extends OnePiece
 		}
 
 		//	SET
-		if(!$set = self::_set($args, $db)){
+		if(!$set = dml::set($args, $db)){
 			Notice::Set("Has not been set condition. ($table)");
 			return false;
 		}
 
 		return "INSERT INTO {$table} SET {$set}";
-	}
-
-	/**
-	 * Get set condition.
-	 *
-	 * @param  array
-	 * @param  db
-	 * @return string
-	 */
-	static function _set($args, $db)
-	{
-		foreach( $args['set'] as $column => $value ){
-			$column	 = $db->Quote($column);
-			$value	 = $db->GetPDO()->quote($value);
-			$join[] = "{$column} = {$value}";
-		}
-		return join(', ', $join);
 	}
 }
