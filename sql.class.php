@@ -46,7 +46,7 @@ class sql extends OnePiece
 	 */
 	function Insert($args)
 	{
-		return insert::Get($args);
+		return insert::Get($args, $this->_db);
 	}
 
 	/**
