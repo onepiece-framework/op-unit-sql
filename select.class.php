@@ -69,21 +69,21 @@ class select extends OnePiece
 				$column = explode(',', $column);
 			}
 			foreach($column as $key => $val){
-				$join[] = $pdo->quote(trim($val));
+				$val = trim($val);
+				if( strpos($val, ' ') !== false ){
+					Notice::Set("Not secure. ($val)");
+					continue;
+				}
+				if( is_string($key) ){
+					$join[] = strtoupper($key)."($val)";
+				}else{
+					$join[] = $pdo->quote(trim($val));
+				}
 			}
 			$result = join(', ', $join);
 		}else{
 			$result = '*';
 		}
 		return $result;
-	}
-
-	/**
-	 * Get limit condition.
-	 *
-	 */
-	static function _limit($args)
-	{
-		return ifset($args['limit']);
 	}
 }

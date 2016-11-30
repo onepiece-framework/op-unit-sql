@@ -27,6 +27,13 @@ class sql extends OnePiece
 	 */
 	private $_db;
 
+	function Count($args)
+	{
+		$args['column']	 = ['COUNT'=>'*'];
+		$args['limit']	 = 1;
+		return select::Get($args, $this->_db);
+	}
+
 	/**
 	 * Generate delete sql statement.
 	 *
