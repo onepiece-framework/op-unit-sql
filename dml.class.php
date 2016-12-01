@@ -90,8 +90,8 @@ class dml extends OnePiece
 
 				case 'BETWEEN':
 					list($st, $en) = explode('TO', substr($value, 1, -1));
-					$st = $db->GetPDO()->quote($st);
-					$en = $db->GetPDO()->quote($en);
+					$st = $db->GetPDO()->quote(trim($st));
+					$en = $db->GetPDO()->quote(trim($en));
 					$join[] = "{$column} {$evalu} {$st} AND {$en}";
 					break;
 
