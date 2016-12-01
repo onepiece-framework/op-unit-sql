@@ -82,9 +82,24 @@ class dml extends OnePiece
 			$value	 = $db->GetPDO()->quote($value);
 			$evalu	 = $db->GetPDO()->quote($evalu);
 			$evalu	 = substr($evalu, 1, -1);
-			$join[] = "{$column} {$evalu} {$value}";
+			switch( $evalu = strtoupper($evalu) ){
+				case 'IS NULL':
+				case 'IS NOT NULL':
+					$join[] = "{$column} {$evalu}";
+					break;
+
+				case 'BETWEEN':
+					list($st, $en) = explode('TO', substr($value, 1, -1));
+					$st = $db->GetPDO()->quote($st);
+					$en = $db->GetPDO()->quote($en);
+					$join[] = "{$column} {$evalu} {$st} AND {$en}";
+					break;
+
+				default:
+					$join[] = "{$column} {$evalu} {$value}";
+			}
 		}
-		return join(' AND ', $join);
+		return '('.join(' AND ', $join).')';
 	}
 
 	/**
