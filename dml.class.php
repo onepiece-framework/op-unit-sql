@@ -95,6 +95,13 @@ class dml extends OnePiece
 					$join[] = "{$column} {$evalu} {$st} AND {$en}";
 					break;
 
+				case 'IN':
+					foreach( explode(',', substr($value, 1, -1)) as $v ){
+						$in[] = $v;
+					}
+					$join[] = "{$column} {$evalu} ('".join("', '", $in)."')";
+					break;
+
 				default:
 					$join[] = "{$column} {$evalu} {$value}";
 			}
