@@ -78,6 +78,17 @@ class sql extends OnePiece
 	}
 
 	/**
+	 * Generate show sql statement.
+	 *
+	 * @param  array $args
+	 * @return string
+	 */
+	function Show($args)
+	{
+		return show::Get($args, $this->_db);
+	}
+
+	/**
 	 * Generate update sql statement.
 	 *
 	 * @param  array $args
