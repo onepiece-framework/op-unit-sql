@@ -1,6 +1,6 @@
 <?php
 /**
- * unit-sql:/dml.class.php
+ * unit-sql:/DML.class.php
  *
  * @created   2016-11-30
  * @version   1.0
@@ -9,8 +9,12 @@
  * @copyright Tomoaki Nagahara All right reserved.
  */
 
-/**
- * dml
+/** namespace
+ *
+ */
+namespace SQL;
+
+/** DML
  *
  * @created   2016-11-30
  * @version   1.0
@@ -18,33 +22,36 @@
  * @author    Tomoaki Nagahara <tomoaki.nagahara@gmail.com>
  * @copyright Tomoaki Nagahara All right reserved.
  */
-class dml extends OnePiece
+class DML
 {
-	/**
-	 * Get table condition.
+	/** trait
+	 *
+	 */
+	use \OP_CORE;
+
+	/** Get table condition.
 	 *
 	 * @param  array
 	 * @param  db
 	 * @return string
 	 */
-	static function table($args, $db)
+	static function Table($args, $db)
 	{
 		if( $table = ifset($args['table']) ){
 			$table = $db->Quote($table);
 		}else{
-			Notice::Set("Has not been set table name.");
+			\Notice::Set("Has not been set table name.");
 		}
 		return $table;
 	}
 
-	/**
-	 * Get set condition.
+	/** Get set condition.
 	 *
 	 * @param  array
 	 * @param  db
 	 * @return string
 	 */
-	static function set($args, $db)
+	static function Set($args, $db)
 	{
 		foreach( $args['set'] as $column => $value ){
 			$column	 = $db->Quote($column);
@@ -54,18 +61,17 @@ class dml extends OnePiece
 		return join(', ', $join);
 	}
 
-	/**
-	 * Get where condition.
+	/** Get where condition.
 	 *
 	 * @param  array
 	 * @param  db
 	 * @return string
 	 */
-	static function where($args, $db)
+	static function Where($args, $db)
 	{
 		//	...
 		if( empty($args['where']) ){
-			Notice::Set("Has not been set where condition. ({$args['table']})");
+			\Notice::Set("Has not been set where condition. ({$args['table']})");
 			return false;
 		}
 
@@ -75,7 +81,11 @@ class dml extends OnePiece
 				$evalu = ifset($condition['evalu'], '=');
 				$value = ifset($condition['value']);
 			}else{
-				$evalu = '=';
+				if( $condition === null ){
+					$evalu = 'is null';
+				}else{
+					$evalu = '=';
+				}
 				$value = $condition;
 			}
 			$column	 = $db->Quote($column);
@@ -109,30 +119,45 @@ class dml extends OnePiece
 		return '('.join(' AND ', $join).')';
 	}
 
-	/**
-	 * Get limit condition.
+	/** Get limit condition.
 	 *
 	 * @param  array
-	 * @param  db
 	 * @return string
 	 */
-	static function limit($args, $db)
+	static function Limit($args)
 	{
 		if( empty($args['limit']) ){
-			Notice::Set("Has not been set limit condition. ({$args['table']})");
+			\Notice::Set("Has not been set limit condition. ({$args['table']})");
 		}
 		return (int)$args['limit'];
 	}
 
-	/**
-	 * Get offset condition.
+	/** Get offset condition.
+	 *
+	 * @param  array
+	 * @return string
+	 */
+	static function Offset($args)
+	{
+		return (int)$args['offset'];
+	}
+
+	/** Get order condition.
 	 *
 	 * @param  array
 	 * @param  db
 	 * @return string
 	 */
-	static function offset($args, $db)
+	static function Order($args, $db)
 	{
-		return (int)ifset($args['offset']);
+		foreach( explode(',', $args['order']) as $value ){
+			list($field, $value) = explode(' ', $value);
+			$field  = $db->Quote($field);
+			$field .= $value === 'desc' ? ' DESC': '';
+			$join[] = $field;
+		}
+
+		//	...
+		return "ORDER BY ".join(', ', $join);
 	}
 }

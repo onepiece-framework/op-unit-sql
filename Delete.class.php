@@ -1,27 +1,35 @@
 <?php
 /**
- * unit-sql:/update.class.php
+ * unit-sql:/Delete.class.php
  *
- * @created   2016-11-30
+ * @created   2016-12-01
  * @version   1.0
  * @package   unit-sql
  * @author    Tomoaki Nagahara <tomoaki.nagahara@gmail.com>
  * @copyright Tomoaki Nagahara All right reserved.
  */
 
-/**
- * update
+/** namespace
  *
- * @created   2016-11-30
+ */
+namespace SQL;
+
+/** Delete
+ *
+ * @created   2016-12-01
  * @version   1.0
  * @package   unit-sql
  * @author    Tomoaki Nagahara <tomoaki.nagahara@gmail.com>
  * @copyright Tomoaki Nagahara All right reserved.
  */
-class update extends OnePiece
+class Delete
 {
-	/**
-	 * Get update sql statement.
+	/** trait
+	 *
+	 */
+	use \OP_CORE;
+
+	/** Get delete sql statement.
 	 *
 	 * @param  array
 	 * @param  db
@@ -31,12 +39,6 @@ class update extends OnePiece
 	{
 		//	TABLE
 		if(!$table = dml::table($args, $db) ){
-			return false;
-		}
-
-		//	SET
-		if(!$set = dml::set($args, $db)){
-			Notice::Set("Has not been set condition. ($table)");
 			return false;
 		}
 
@@ -50,6 +52,6 @@ class update extends OnePiece
 			return false;
 		}
 
-		return "UPDATE {$table} SET {$set} WHERE {$where} LIMIT {$limit}";
+		return "DELETE FROM {$table} WHERE {$where} LIMIT {$limit}";
 	}
 }

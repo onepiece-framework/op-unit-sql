@@ -1,27 +1,35 @@
 <?php
 /**
- * unit-sql:/insert.class.php
+ * unit-sql:/Update.class.php
  *
- * @created   2016-11-28
+ * @created   2016-11-30
  * @version   1.0
  * @package   unit-sql
  * @author    Tomoaki Nagahara <tomoaki.nagahara@gmail.com>
  * @copyright Tomoaki Nagahara All right reserved.
  */
 
-/**
- * insert
+/** namespace
  *
- * @created   2016-11-29
+ */
+namespace SQL;
+
+/** Update
+ *
+ * @created   2016-11-30
  * @version   1.0
  * @package   unit-sql
  * @author    Tomoaki Nagahara <tomoaki.nagahara@gmail.com>
  * @copyright Tomoaki Nagahara All right reserved.
  */
-class insert extends OnePiece
+class Update
 {
-	/**
-	 * Get insert sql statement.
+	/** trait
+	 *
+	 */
+	use \OP_CORE;
+
+	/** Get update sql statement.
 	 *
 	 * @param  array
 	 * @param  db
@@ -30,19 +38,26 @@ class insert extends OnePiece
 	static function Get($args, $db=null)
 	{
 		//	TABLE
-		if( $table = ifset($args['table']) ){
-			$table = $db->Quote($table);
-		}else{
-			Notice::Set("Has not been set table name.");
+		if(!$table = dml::table($args, $db) ){
 			return false;
 		}
 
 		//	SET
 		if(!$set = dml::set($args, $db)){
-			Notice::Set("Has not been set condition. ($table)");
+			\Notice::Set("Has not been set condition. ($table)");
 			return false;
 		}
 
-		return "INSERT INTO {$table} SET {$set}";
+		//	WHERE
+		if(!$where = dml::where($args, $db) ){
+			return false;
+		}
+
+		//	LIMIT
+		if(!$limit = dml::limit($args, $db)){
+			return false;
+		}
+
+		return "UPDATE {$table} SET {$set} WHERE {$where} LIMIT {$limit}";
 	}
 }

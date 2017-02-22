@@ -1,6 +1,6 @@
 <?php
 /**
- * unit-sql:/select.class.php
+ * unit-sql:/Select.class.php
  *
  * @created   2016-11-28
  * @version   1.0
@@ -9,8 +9,12 @@
  * @copyright Tomoaki Nagahara All right reserved.
  */
 
-/**
- * select
+/** namespace
+ *
+ */
+namespace SQL;
+
+/** Select
  *
  * @created   2016-11-29
  * @version   1.0
@@ -18,10 +22,14 @@
  * @author    Tomoaki Nagahara <tomoaki.nagahara@gmail.com>
  * @copyright Tomoaki Nagahara All right reserved.
  */
-class select extends OnePiece
+class Select
 {
-	/**
-	 * Get select sql statement.
+	/** trait
+	 *
+	 */
+	use \OP_CORE;
+
+	/** Get select sql statement.
 	 *
 	 * @param  array $args
 	 * @param  db $db
@@ -30,39 +38,42 @@ class select extends OnePiece
 	static function Get($args, $db=null)
 	{
 		//	TABLE
-		if(!$table = dml::table($args, $db) ){
+		if(!$table = DML::Table($args, $db) ){
 			return false;
 		}
 
 		//	COLUMN
-		if(!$column = self::_column($args, $db)){
+		if(!$column = self::_Column($args, $db)){
 			return false;
 		}
 
 		//	WHERE
-		if(!$where = dml::where($args, $db) ){
+		if(!$where = DML::Where($args, $db) ){
 			return false;
 		}
 
 		//	LIMIT
-		if(!$limit = dml::limit($args, $db)){
+		if(!$limit = DML::Limit($args, $db)){
 			return false;
 		}
 
 		//	OFFSET
-		$offset = dml::offset($args, $db);
+		$offset = isset($args['offset']) ? DML::Offset($args, $db): 0;
 
-		return "SELECT {$column} FROM {$table} WHERE {$where} LIMIT {$limit} OFFSET {$offset}";
+		//	ORDER
+		$order  = isset($args['order'])  ? DML::Order($args,  $db): null;
+
+		//	...
+		return "SELECT {$column} FROM {$table} WHERE {$where} {$order} LIMIT {$limit} OFFSET {$offset}";
 	}
 
-	/**
-	 * Get column condition.
+	/** Get column condition.
 	 *
 	 * @param  array $args
 	 * @param  PDO $pdo
 	 * @return string
 	 */
-	static private function _column($args, $pdo)
+	static private function _Column($args, $pdo)
 	{
 		if( $column = ifset($args['column']) ){
 			if( is_string($column) ){
@@ -71,7 +82,7 @@ class select extends OnePiece
 			foreach($column as $key => $val){
 				$val = trim($val);
 				if( strpos($val, ' ') !== false ){
-					Notice::Set("Not secure. ($val)");
+					\Notice::Set("Not secure. ($val)");
 					continue;
 				}
 				if( is_string($key) ){

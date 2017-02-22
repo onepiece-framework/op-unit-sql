@@ -1,6 +1,6 @@
 <?php
 /**
- * unit-sql:/show.class.php
+ * unit-sql:/Show.class.php
  *
  * @created   2016-12-07
  * @version   1.0
@@ -9,8 +9,12 @@
  * @copyright Tomoaki Nagahara All right reserved.
  */
 
-/**
- * show
+/** namespace
+ *
+ */
+namespace SQL;
+
+/** Show
  *
  * @created   2016-12-07
  * @version   1.0
@@ -18,10 +22,14 @@
  * @author    Tomoaki Nagahara <tomoaki.nagahara@gmail.com>
  * @copyright Tomoaki Nagahara All right reserved.
  */
-class show extends OnePiece
+class Show
 {
-	/**
-	 * Get show sql statement.
+	/** trait
+	 *
+	 */
+	use \OP_CORE;
+
+	/** Get show sql statement.
 	 *
 	 * @param  array $args
 	 * @param  db    $db

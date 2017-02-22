@@ -1,6 +1,6 @@
 <?php
 /**
- * unit-sql:/sql.class.php
+ * unit-sql:/SQL.class.php
  *
  * @created   2016-11-28
  * @version   1.0
@@ -9,8 +9,7 @@
  * @copyright Tomoaki Nagahara All right reserved.
  */
 
-/**
- * sql
+/** SQL
  *
  * @created   2016-11-29
  * @version   1.0
@@ -18,57 +17,62 @@
  * @author    Tomoaki Nagahara <tomoaki.nagahara@gmail.com>
  * @copyright Tomoaki Nagahara All right reserved.
  */
-class sql extends OnePiece
+class SQL
 {
-	/**
-	 * Database unit.
+	/** trait
+	 *
+	 */
+	use OP_CORE;
+
+	/** Database unit.
 	 *
 	 * @var db
 	 */
 	private $_db;
 
+	/** Count
+	 *
+	 * @param  array  $args
+	 * @return string
+	 */
 	function Count($args)
 	{
 		$args['column']	 = ['COUNT'=>'*'];
 		$args['limit']	 = 1;
-		return select::Get($args, $this->_db);
+		return SQL\Select::Get($args, $this->_db);
 	}
 
-	/**
-	 * Generate delete sql statement.
+	/** Generate delete sql statement.
 	 *
 	 * @param  array $args
 	 * @return string
 	 */
 	function Delete($args)
 	{
-		return delete::Get($args, $this->_db);
+		return SQL\Delete::Get($args, $this->_db);
 	}
 
-	/**
-	 * Generate insert sql statement.
+	/** Generate insert sql statement.
 	 *
 	 * @param  array $args
 	 * @return string
 	 */
 	function Insert($args)
 	{
-		return insert::Get($args, $this->_db);
+		return SQL\Insert::Get($args, $this->_db);
 	}
 
-	/**
-	 * Generate select sql statement.
+	/** Generate select sql statement.
 	 *
 	 * @param  array $args
 	 * @return string
 	 */
 	function Select($args)
 	{
-		return select::Get($args, $this->_db);
+		return SQL\Select::Get($args, $this->_db);
 	}
 
-	/**
-	 * Set database unit object.
+	/** Set database unit object.
 	 *
 	 * @param db $db
 	 */
@@ -77,25 +81,23 @@ class sql extends OnePiece
 		$this->_db = $db;
 	}
 
-	/**
-	 * Generate show sql statement.
+	/** Generate show sql statement.
 	 *
 	 * @param  array $args
 	 * @return string
 	 */
-	function Show($args)
+	function Show($args=null)
 	{
-		return show::Get($args, $this->_db);
+		return SQL\Show::Get($args, $this->_db);
 	}
 
-	/**
-	 * Generate update sql statement.
+	/** Generate update sql statement.
 	 *
 	 * @param  array $args
 	 * @return string
 	 */
 	function Update($args)
 	{
-		return update::Get($args, $this->_db);
+		return SQL\Update::Get($args, $this->_db);
 	}
 }

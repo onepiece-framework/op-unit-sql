@@ -1,27 +1,35 @@
 <?php
 /**
- * unit-sql:/delete.class.php
+ * unit-sql:/Insert.class.php
  *
- * @created   2016-12-01
+ * @created   2016-11-28
  * @version   1.0
  * @package   unit-sql
  * @author    Tomoaki Nagahara <tomoaki.nagahara@gmail.com>
  * @copyright Tomoaki Nagahara All right reserved.
  */
 
-/**
- * delete
+/** namespace
  *
- * @created   2016-12-01
+ */
+namespace SQL;
+
+/** Insert
+ *
+ * @created   2016-11-29
  * @version   1.0
  * @package   unit-sql
  * @author    Tomoaki Nagahara <tomoaki.nagahara@gmail.com>
  * @copyright Tomoaki Nagahara All right reserved.
  */
-class delete extends OnePiece
+class Insert
 {
-	/**
-	 * Get delete sql statement.
+	/** trait
+	 *
+	 */
+	use \OP_CORE;
+
+	/** Get insert sql statement.
 	 *
 	 * @param  array
 	 * @param  db
@@ -30,20 +38,19 @@ class delete extends OnePiece
 	static function Get($args, $db=null)
 	{
 		//	TABLE
-		if(!$table = dml::table($args, $db) ){
+		if( $table = ifset($args['table']) ){
+			$table = $db->Quote($table);
+		}else{
+			\Notice::Set("Has not been set table name.");
 			return false;
 		}
 
-		//	WHERE
-		if(!$where = dml::where($args, $db) ){
+		//	SET
+		if(!$set = dml::set($args, $db)){
+			\Notice::Set("Has not been set condition. ($table)");
 			return false;
 		}
 
-		//	LIMIT
-		if(!$limit = dml::limit($args, $db)){
-			return false;
-		}
-
-		return "DELETE FROM {$table} WHERE {$where} LIMIT {$limit}";
+		return "INSERT INTO {$table} SET {$set}";
 	}
 }
