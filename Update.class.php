@@ -38,23 +38,23 @@ class Update
 	static function Get($args, $db=null)
 	{
 		//	TABLE
-		if(!$table = dml::table($args, $db) ){
+		if(!$table = DML::table($args, $db) ){
 			return false;
 		}
 
 		//	SET
-		if(!$set = dml::set($args, $db)){
+		if(!$set = DML::set($args, $db)){
 			\Notice::Set("Has not been set condition. ($table)");
 			return false;
 		}
 
 		//	WHERE
-		if(!$where = dml::where($args, $db) ){
+		if(!$where = DML::where($args, $db) ){
 			return false;
 		}
 
 		//	LIMIT
-		if(!$limit = dml::limit($args, $db)){
+		if(!$limit = DML::limit($args, $db)){
 			return false;
 		}
 

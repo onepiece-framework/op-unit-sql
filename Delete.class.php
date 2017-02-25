@@ -38,17 +38,17 @@ class Delete
 	static function Get($args, $db=null)
 	{
 		//	TABLE
-		if(!$table = dml::table($args, $db) ){
+		if(!$table = DML::table($args, $db) ){
 			return false;
 		}
 
 		//	WHERE
-		if(!$where = dml::where($args, $db) ){
+		if(!$where = DML::where($args, $db) ){
 			return false;
 		}
 
 		//	LIMIT
-		if(!$limit = dml::limit($args, $db)){
+		if(!$limit = DML::limit($args, $db)){
 			return false;
 		}
 
