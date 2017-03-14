@@ -39,11 +39,23 @@ class Show
 	{
 		if( $database = ifset($args['database']) ){
 			$database = $db->Quote($database);
-			$sql = "SHOW TABLES FROM {$database}";
+			if( $table = ifset($args['table']) ){
+				$table = $db->Quote($table);
+				if( ifset($args['index']) ){
+					//	Indexes list.
+					$query = "SHOW INDEX FROM {$database}.{$table}";
+				}else{
+					//	Tables list.
+					$query = "SHOW FULL COLUMNS FROM {$database}.{$table}";
+				}
+			}else{
+				//	Databases list.
+				$query = "SHOW TABLES FROM {$database}";
+			}
 		}else{
-			$sql = 'SHOW DATABASES';
+			$query = 'SHOW DATABASES';
 		}
 
-		return $sql;
+		return $query;
 	}
 }
