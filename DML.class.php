@@ -53,11 +53,20 @@ class DML
 	 */
 	static function Set($args, $db)
 	{
+		//	...
+		if( empty($args['set']) ){
+			\Notice::Set("Has not been set SET condition. ({$args['table']})");
+			return false;
+		}
+
+		//	...
 		foreach( $args['set'] as $column => $value ){
 			$column	 = $db->Quote($column);
 			$value	 = $db->GetPDO()->quote($value);
 			$join[] = "{$column} = {$value}";
 		}
+
+		//	...
 		return join(', ', $join);
 	}
 
