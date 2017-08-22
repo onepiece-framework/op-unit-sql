@@ -95,7 +95,13 @@ class DML
 	{
 		//	...
 		if( empty($args['where']) ){
-			\Notice::Set("Has not been set where condition. ({$args['table']})");
+			\Notice::Set("Has not been set WHERE condition. ({$args['table']})");
+			return false;
+		}
+
+		//	...
+		if( 'array' !== $type = gettype($args['where']) ){
+			\Notice::Set("WHERE condition is not assoc. ( type --> $type)");
 			return false;
 		}
 
@@ -151,7 +157,8 @@ class DML
 	static function Limit($args)
 	{
 		if( empty($args['limit']) ){
-			\Notice::Set("Has not been set limit condition. ({$args['table']})");
+			\Notice::Set("Has not been set LIMIT condition. ({$args['table']})");
+			return false;
 		}
 		return (int)$args['limit'];
 	}
