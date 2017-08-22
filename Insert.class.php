@@ -37,6 +37,12 @@ class Insert
 	 */
 	static function Get($args, $db=null)
 	{
+		//	...
+		if(!$db){
+			\Notice::Set("Has not been set database object.");
+			return false;
+		}
+
 		//	TABLE
 		if( $table = ifset($args['table']) ){
 			$table = $db->Quote($table);
