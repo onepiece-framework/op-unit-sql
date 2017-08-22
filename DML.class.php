@@ -37,12 +37,27 @@ class DML
 	 */
 	static function Table($args, $db)
 	{
+		//	...
+		$database = ifset($args['database']);
+
+		//	...
 		if( $table = ifset($args['table']) ){
+			//	test.t_test
+			if( $pos = strpos($table, '.') ){
+				//	test.t_test --> test, t_test
+				$database = substr($table, 0, $pos);
+				$table    = substr($table, $pos+1);
+			}
+
+			//	...
+			$database = $database ? $db->Quote($database).'.': null;
+
+			//	...
 			$table = $db->Quote($table);
 		}else{
 			\Notice::Set("Has not been set table name.");
 		}
-		return $table;
+		return $database.$table;
 	}
 
 	/** Get set condition.
