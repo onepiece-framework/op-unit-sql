@@ -57,6 +57,21 @@ class Insert
 			return false;
 		}
 
-		return "INSERT INTO {$table} SET {$set}";
+		//	ON DUPLICATE KEY UPDATE
+		if( $keys   = ifset($args['update']) ){
+			$update = "ON DUPLICATE KEY UPDATE ";
+			$temp   = [];
+			$temp['table'] = $args['table'];
+			foreach( explode(',', $keys) as $key ){
+				$key = trim($key);
+				$temp['set'][$key] = $args['set'][$key];
+			}
+			$update .= DML::Set($temp, $db);
+		}else{
+			$update  = null;
+		}
+
+		//	...
+		return "INSERT INTO {$table} SET {$set} {$update}";
 	}
 }
