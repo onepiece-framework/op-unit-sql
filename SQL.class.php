@@ -9,6 +9,12 @@
  * @copyright Tomoaki Nagahara All right reserved.
  */
 
+/** namespace
+ *
+ * @creation  2017-12-05
+ */
+namespace OP\UNIT\SQL;
+
 /** SQL
  *
  * @created   2016-11-29
