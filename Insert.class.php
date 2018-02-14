@@ -53,7 +53,6 @@ class Insert
 
 		//	SET
 		if(!$set = DML::set($args, $db)){
-			\Notice::Set("Has not been set condition. ($table)");
 			return false;
 		}
 
