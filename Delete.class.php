@@ -38,6 +38,9 @@ class Delete
 	static function Get($args, $db=null)
 	{
 		//	...
+		$args = Escape($args);
+
+		//	...
 		if(!$db){
 			\Notice::Set("Has not been set database object.");
 			return false;
