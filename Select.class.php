@@ -12,7 +12,7 @@
 /** namespace
  *
  */
-namespace SQL;
+namespace OP\UNIT\SQL;
 
 /** Select
  *
@@ -31,15 +31,12 @@ class Select
 
 	/** Get select sql statement.
 	 *
-	 * @param  array $args
-	 * @param  db $db
+	 * @param  array       $args
+	 * @param  \OP\UNIT\DB $DB
 	 * @return string
 	 */
 	static function Get($args, $db=null)
 	{
-		//	...
-		$args = Escape($args);
-
 		//	...
 		if(!$db){
 			\Notice::Set("Has not been set database object.");
@@ -84,26 +81,65 @@ class Select
 	 */
 	static private function _Column($args, $pdo)
 	{
+		//	...
 		if( $column = ifset($args['column']) ){
+			//	...
 			if( is_string($column) ){
 				$column = explode(',', $column);
 			}
+
+			//	...
 			foreach($column as $key => $val){
+				//	...
 				$val = trim($val);
+
+				//	...
+				if( $st = strpos($val, '(') and
+					$en = strpos($val, ')') ){
+					//	...
+					$func  = strtoupper( substr($val,     0, $st) );
+					$field = strtoupper( substr($val, $st+1,  -1) );
+					$field = $pdo->quote(trim($field));
+
+					//	...
+					$join[] = "$func($field)";
+					continue;
+				}
+
+				//	...
 				if( strpos($val, ' ') !== false ){
 					\Notice::Set("Not secure. ($val)");
 					continue;
 				}
+
+				//	...
 				if( is_string($key) ){
 					$join[] = strtoupper($key)."($val)";
 				}else{
 					$join[] = $pdo->quote(trim($val));
 				}
 			}
+
+			//	...
 			$result = join(', ', $join);
 		}else{
 			$result = '*';
 		}
+
+		//	...
 		return $result;
+	}
+
+	/** Generate hashed password.
+	 *
+	 * @param  string      $password
+	 * @param  \OP\UNIT\DB $DB
+	 * @return string
+	 */
+	static function Password($password, $DB)
+	{
+		//	...
+		$password = $DB->GetPDO()->Quote($password);
+		return "SELECT PASSWORD({$password})";
 	}
 }

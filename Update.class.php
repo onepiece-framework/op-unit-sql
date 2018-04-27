@@ -11,8 +11,10 @@
 
 /** namespace
  *
+ * @created   2016-??-??
+ * @changed   2018-01-02
  */
-namespace SQL;
+namespace OP\UNIT\SQL;
 
 /** Update
  *
@@ -37,9 +39,6 @@ class Update
 	 */
 	static function Get($args, $db=null)
 	{
-		//	...
-		$args = Escape($args);
-
 		//	...
 		if(!$db){
 			\Notice::Set("Has not been set database object.");

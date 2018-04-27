@@ -11,9 +11,9 @@
 
 /** namespace
  *
- * @creation  2017-12-05
+ * @created   2018-02-16
  */
-namespace OP\UNIT\SQL;
+namespace OP\UNIT;
 
 /** SQL
  *
@@ -28,82 +28,73 @@ class SQL
 	/** trait
 	 *
 	 */
-	use OP_CORE;
-
-	/** Database unit.
-	 *
-	 * @var db
-	 */
-	private $_db;
+	use \OP_CORE;
 
 	/** Count
 	 *
 	 * @param  array  $args
+	 * @param  DB     $DB
 	 * @return string
 	 */
-	function Count($args)
+	function Count($args, $DB)
 	{
 		$args['column']	 = ['COUNT'=>'*'];
 		$args['limit']	 = 1;
-		return SQL\Select::Get($args, $this->_db);
+		return SQL\Select::Get($args, $DB);
 	}
 
 	/** Generate delete sql statement.
 	 *
-	 * @param  array $args
+	 * @param  array  $args
+	 * @param  DB     $DB
 	 * @return string
 	 */
-	function Delete($args)
+	function Delete($args, $DB)
 	{
-		return SQL\Delete::Get($args, $this->_db);
+		return SQL\Delete::Get($args, $DB);
 	}
 
 	/** Generate insert sql statement.
 	 *
-	 * @param  array $args
+	 * @param  array  $args
+	 * @param  DB     $DB
 	 * @return string
 	 */
-	function Insert($args)
+	function Insert($args, $DB)
 	{
-		return SQL\Insert::Get($args, $this->_db);
+		return SQL\Insert::Get($args, $DB);
 	}
 
 	/** Generate select sql statement.
 	 *
-	 * @param  array $args
+	 * @param  array  $args
+	 * @param  DB     $DB
 	 * @return string
 	 */
-	function Select($args)
+	function Select($args, $DB)
 	{
-		return SQL\Select::Get($args, $this->_db);
-	}
-
-	/** Set database unit object.
-	 *
-	 * @param db $db
-	 */
-	function SetDatabase($db)
-	{
-		$this->_db = $db;
+		return SQL\Select::Get($args, $DB);
 	}
 
 	/** Generate show sql statement.
 	 *
-	 * @param  array $args
+	 * @param  array  $args
+	 * @param  DB     $DB
 	 * @return string
 	 */
-	function Show($args=null)
+	function Show($args=null, $DB)
 	{
-		return SQL\Show::Get($args, $this->_db);
+		return SQL\Show::Get($args, $DB);
 	}
 
 	/** Generate update sql statement.
 	 *
-	 * @param  array $args
+	 * @param  array  $args
+	 * @param  DB     $DB
 	 * @return string
 	 */
-	function Update($args)
+	function Update($args, $DB)
 	{
-		return SQL\Update::Get($args, $this->_db);
+		return SQL\Update::Get($args, $DB);
 	}
 }

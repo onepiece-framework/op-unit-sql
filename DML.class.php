@@ -11,8 +11,10 @@
 
 /** namespace
  *
+ * @created   2016-??-??
+ * @changed   2018-01-02
  */
-namespace SQL;
+namespace OP\UNIT\SQL;
 
 /** DML
  *
@@ -111,17 +113,24 @@ class DML
 				$evalu = ifset($condition['evalu'], '=');
 				$value = ifset($condition['value']);
 			}else{
-				if( $condition === null ){
-					$evalu = 'is null';
-				}else{
-					$evalu = '=';
-				}
 				$value = $condition;
+				$evalu = '=';
 			}
+
+			//	...
+			if( $value === null ){
+				$evalu = $evalu === '=' ? 'IS NULL':'IS NOT NULL';
+			}
+
+			//	...
 			$column	 = $db->Quote($column);
 			$value	 = $db->GetPDO()->quote($value);
+			/*
 			$evalu	 = $db->GetPDO()->quote($evalu);
 			$evalu	 = substr($evalu, 1, -1);
+			*/
+
+			//	...
 			switch( $evalu = strtoupper($evalu) ){
 				case 'IS NULL':
 				case 'IS NOT NULL':
@@ -129,21 +138,50 @@ class DML
 					break;
 
 				case 'BETWEEN':
-					list($st, $en) = explode('TO', substr($value, 1, -1));
+					//	'1 TO 10' --> 1 TO 100
+					$value = substr($value, 1, -1);
+					list($st, $en) = explode('TO', $value);
 					$st = $db->GetPDO()->quote(trim($st));
 					$en = $db->GetPDO()->quote(trim($en));
 					$join[] = "{$column} {$evalu} {$st} AND {$en}";
 					break;
 
 				case 'IN':
-					foreach( explode(',', substr($value, 1, -1)) as $v ){
-						$in[] = $v;
+				case 'NOT IN':
+					//	...
+					if( is_string($value) ){
+						//	'foo, bar' --> foo, bar
+						$value = substr($value, 1, -1);
+						$value = explode(',', $value.',');
+					}else if( is_array($value) ){
+						$value = $value;
+					}else{
+						$value = [];
 					}
-					$join[] = "{$column} {$evalu} ('".join("', '", $in)."')";
+
+					//	...
+					$in = [];
+					foreach( $value as $temp ){
+						if( strlen($temp) ){
+							$in[] = $db->GetPDO()->quote(trim($temp));
+						}
+					}
+
+					//	...
+					$value  = join(',', $in);
+					$join[] = "{$column} {$evalu} ({$value})";
+					break;
+
+				case '=':
+				case '>':
+				case '<':
+				case '>=':
+				case '<=':
+					$join[] = "{$column} {$evalu} {$value}";
 					break;
 
 				default:
-					$join[] = "{$column} {$evalu} {$value}";
+					$join[] = "{$column} = {$value}";
 			}
 		}
 		return '('.join(' AND ', $join).')';
@@ -156,7 +194,7 @@ class DML
 	 */
 	static function Limit($args)
 	{
-		if( empty($args['limit']) ){
+		if(!isset($args['limit']) ){
 			\Notice::Set("Has not been set LIMIT condition. ({$args['table']})");
 			return false;
 		}

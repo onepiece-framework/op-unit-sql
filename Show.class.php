@@ -11,8 +11,10 @@
 
 /** namespace
  *
+ * @creation  ????
+ * @changed   2017-12-12
  */
-namespace SQL;
+namespace OP\UNIT\SQL;
 
 /** Show
  *
@@ -29,33 +31,81 @@ class Show
 	 */
 	use \OP_CORE;
 
-	/** Get show sql statement.
+	/** Show database list.
 	 *
-	 * @param  array $args
-	 * @param  db    $db
-	 * @return string
+	 * @param  DB     $db
+	 * @return string $sql
 	 */
-	static function Get($args, $db=null)
+	static function Database($db)
 	{
-		if( $database = ifset($args['database']) ){
-			$database = $db->Quote($database);
-			if( $table = ifset($args['table']) ){
-				$table = $db->Quote($table);
-				if( ifset($args['index']) ){
-					//	Indexes list.
-					$query = "SHOW INDEX FROM {$database}.{$table}";
-				}else{
-					//	Tables list.
-					$query = "SHOW FULL COLUMNS FROM {$database}.{$table}";
-				}
-			}else{
-				//	Databases list.
-				$query = "SHOW TABLES FROM {$database}";
-			}
-		}else{
-			$query = 'SHOW DATABASES';
+		return 'SHOW DATABASES';
+	}
+
+	/** Show table list.
+	 *
+	 * @param  DB     $db
+	 * @param  string $database
+	 * @return string $sql
+	 */
+	static function Table($db, $database)
+	{
+		$database = $db->Quote($database);
+		return "SHOW TABLES FROM {$database}";
+	}
+
+	/** Show column list
+	 *
+	 * @param  DB     $DB
+	 * @param  string $database
+	 * @param  string $table
+	 * @return string $sql
+	 */
+	static function Column($DB, $database, $table)
+	{
+		//	...
+		static $_cache;
+
+		//	...
+		if( isset( $_cache[$database][$table]) ){
+			return $_cache[$database][$table];
 		}
 
-		return $query;
+		//	...
+		$database = $DB->Quote($database);
+		$table    = $DB->Quote($table);
+
+		//	...
+		return $_cache[$database][$table] = "SHOW FULL COLUMNS FROM {$database}.{$table}";
+	}
+
+	/** Show index list.
+	 *
+	 * @param  DB     $db
+	 * @param  string $database
+	 * @param  string $table
+	 * @return string $sql
+	 */
+	static function Index($db, $database, $table)
+	{
+		$database = $db->Quote($database);
+		$table    = $db->Quote($table);
+		return "SHOW INDEX FROM {$database}.{$table}";
+	}
+
+	/** Show user list.
+	 *
+	 * @param  \OP\UNIT\DB $DB
+	 */
+	static function User($DB)
+	{
+		switch( $prod = $DB->Driver() ){
+			case 'mysql':
+				$sql = "SELECT host, user, password FROM mysql.user";
+				break;
+
+			default:
+				$sql = false;
+		}
+		return $sql;
 	}
 }

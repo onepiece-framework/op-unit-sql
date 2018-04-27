@@ -11,8 +11,10 @@
 
 /** namespace
  *
+ * @created   2016-??-??
+ * @changed   2018-01-02
  */
-namespace SQL;
+namespace OP\UNIT\SQL;
 
 /** Insert
  *
@@ -38,9 +40,6 @@ class Insert
 	static function Get($args, $db=null)
 	{
 		//	...
-		$args = Escape($args);
-
-		//	...
 		if(!$db){
 			\Notice::Set("Has not been set database object.");
 			return false;
@@ -56,21 +55,23 @@ class Insert
 
 		//	SET
 		if(!$set = DML::set($args, $db)){
+			\Notice::Set("Has not been set condition. ($table)");
 			return false;
 		}
 
 		//	ON DUPLICATE KEY UPDATE
-		if( $keys   = ifset($args['update']) ){
-			$update = "ON DUPLICATE KEY UPDATE ";
-			$temp   = [];
-			$temp['table'] = $args['table'];
-			foreach( explode(',', $keys) as $key ){
-				$key = trim($key);
-				$temp['set'][$key] = $args['set'][$key];
+		if( $update = ifset($args['update']) ){
+			if(!is_string($update) ){
+				\Notice::Set('The "ON DUPLICATE KEY UPDATE" is not string. (Please set of field name)');
+				return false;
 			}
-			$update .= DML::Set($temp, $db);
-		}else{
-			$update  = null;
+			$dml = [];
+			$dml['table'] = $args['table']; // For error message.
+			foreach( explode(',', $update) as $key ){
+				$key = trim($key);
+				$dml['set'][$key] = $args['set'][$key];
+			}
+			$update = "ON DUPLICATE KEY UPDATE " . DML::Set($dml, $db);
 		}
 
 		//	...
