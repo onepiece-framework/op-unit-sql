@@ -221,7 +221,7 @@ class DML
 	 */
 	static function Offset($args)
 	{
-		return (int)$args['offset'];
+		return 'OFFSET ' . (int)$args['offset'];
 	}
 
 	/** Generate order condition.
