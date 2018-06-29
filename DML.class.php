@@ -211,7 +211,7 @@ class DML
 			\Notice::Set("Has not been set LIMIT condition. ({$args['table']})");
 			return false;
 		}
-		return (int)$args['limit'];
+		return 'LIMIT '.(int)$args['limit'];
 	}
 
 	/** Generate offset condition.
