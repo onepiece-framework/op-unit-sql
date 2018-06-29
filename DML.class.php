@@ -110,7 +110,7 @@ class DML
 	 * @param  \IF_DATABASE
 	 * @return  string
 	 */
-	static function Where($args, $db)
+	static function Where( array $args, \IF_DATABASE $db)
 	{
 		//	...
 		if( empty($args['where']) ){
