@@ -64,14 +64,14 @@ class Select
 			return false;
 		}
 
-		//	OFFSET
-		$offset = isset($args['offset']) ? DML::Offset($args, $db): 0;
-
 		//	ORDER
 		$order  = isset($args['order'])  ? DML::Order($args,  $db): null;
 
+		//	OFFSET
+		$offset = isset($args['offset']) ? DML::Offset($args, $db): null;
+
 		//	...
-		return "SELECT {$column} FROM {$table} WHERE {$where} {$order} LIMIT {$limit} OFFSET {$offset}";
+		return "SELECT {$column} FROM {$table} WHERE {$where} {$order} {$limit} {$offset}";
 	}
 
 	/** Get column condition.
