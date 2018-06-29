@@ -65,6 +65,22 @@ class Update
 			return false;
 		}
 
-		return "UPDATE {$table} SET {$set} WHERE {$where} LIMIT {$limit}";
+		//	ORDER
+		$order = null;
+		if( isset($args['order']) ){
+			if( $db->Config()['prod'] === 'mysql' ){
+				$order = DML::Order($args,  $db);
+			}else{
+				\Notice::Set("Could not used ORDER for UPDATE SQL. (Except MYSQL)");
+			}
+		}
+
+		//	OFFSET
+		if( isset($args['offset']) ){
+			\Notice::Set("Could not used OFFSET for UPDATE SQL. ($table)");
+			return false;
+		}
+
+		return "UPDATE {$table} SET {$set} WHERE {$where} {$order} {$limit}";
 	}
 }
