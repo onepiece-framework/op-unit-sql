@@ -60,6 +60,22 @@ class Delete
 			return false;
 		}
 
-		return "DELETE FROM {$table} WHERE {$where} LIMIT {$limit}";
+		//	ORDER
+		$order = null;
+		if( isset($args['order']) ){
+			if( $db->Config()['prod'] === 'mysql' ){
+				$order = DML::Order($args,  $db);
+			}else{
+				\Notice::Set("Could not used ORDER for DELETE SQL. (Except MYSQL)");
+			}
+		}
+
+		//	OFFSET
+		if( isset($args['offset']) ){
+			\Notice::Set("Could not used OFFSET for DELETE SQL. ($table)");
+			return false;
+		}
+
+		return "DELETE FROM {$table} WHERE {$where} {$order} {$limit}";
 	}
 }
