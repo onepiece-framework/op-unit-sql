@@ -88,6 +88,11 @@ class Column
 		}
 
 		//	...
+		if( $verb === 'MODIFY' ){
+			$index = null;
+		}
+
+		//	...
 		return "ALTER TABLE $database.$table $verb $common $first $after $index";
 	}
 
