@@ -33,9 +33,9 @@ class Update
 
 	/** Get update sql statement.
 	 *
-	 * @param  array
-	 * @param  db
-	 * @return string
+	 * @param   array       $config
+	 * @param  \IF_DATABASE $DB
+	 * @return  string      $SQL
 	 */
 	static function Get($args, $db=null)
 	{

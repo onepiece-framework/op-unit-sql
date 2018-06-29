@@ -11,6 +11,7 @@
 
 /** namespace
  *
+ * @created   2018-04-27
  */
 namespace OP\UNIT\SQL;
 
@@ -31,9 +32,9 @@ class Select
 
 	/** Get select sql statement.
 	 *
-	 * @param  array       $args
-	 * @param  \OP\UNIT\DB $DB
-	 * @return string
+	 * @param   array       $config
+	 * @param  \IF_DATABASE $DB
+	 * @return  string      $SQL
 	 */
 	static function Get($args, $db=null)
 	{

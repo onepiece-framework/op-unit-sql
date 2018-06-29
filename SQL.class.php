@@ -32,9 +32,9 @@ class SQL
 
 	/** Count
 	 *
-	 * @param  array  $args
-	 * @param  DB     $DB
-	 * @return string
+	 * @param   array       $config
+	 * @param  \IF_DATABASE $DB
+	 * @return  string      $query
 	 */
 	function Count($args, $DB)
 	{
@@ -45,9 +45,9 @@ class SQL
 
 	/** Generate delete sql statement.
 	 *
-	 * @param  array  $args
-	 * @param  DB     $DB
-	 * @return string
+	 * @param   array       $config
+	 * @param  \IF_DATABASE $DB
+	 * @return  string      $query
 	 */
 	function Delete($args, $DB)
 	{
@@ -56,9 +56,9 @@ class SQL
 
 	/** Generate insert sql statement.
 	 *
-	 * @param  array  $args
-	 * @param  DB     $DB
-	 * @return string
+	 * @param   array       $config
+	 * @param  \IF_DATABASE $DB
+	 * @return  string      $query
 	 */
 	function Insert($args, $DB)
 	{
@@ -67,9 +67,9 @@ class SQL
 
 	/** Generate select sql statement.
 	 *
-	 * @param  array  $args
-	 * @param  DB     $DB
-	 * @return string
+	 * @param   array       $config
+	 * @param  \IF_DATABASE $DB
+	 * @return  string      $query
 	 */
 	function Select($args, $DB)
 	{
@@ -78,9 +78,9 @@ class SQL
 
 	/** Generate show sql statement.
 	 *
-	 * @param  array  $args
-	 * @param  DB     $DB
-	 * @return string
+	 * @param   array       $config
+	 * @param  \IF_DATABASE $DB
+	 * @return  string      $query
 	 */
 	function Show($args=null, $DB)
 	{
@@ -89,9 +89,9 @@ class SQL
 
 	/** Generate update sql statement.
 	 *
-	 * @param  array  $args
-	 * @param  DB     $DB
-	 * @return string
+	 * @param   array       $config
+	 * @param  \IF_DATABASE $DB
+	 * @return  string      $query
 	 */
 	function Update($args, $DB)
 	{

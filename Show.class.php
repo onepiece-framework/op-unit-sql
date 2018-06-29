@@ -33,19 +33,18 @@ class Show
 
 	/** Show database list.
 	 *
-	 * @param  DB     $db
-	 * @return string $sql
+	 * @return	 string		 $sql
 	 */
-	static function Database($db)
+	static function Database()
 	{
 		return 'SHOW DATABASES';
 	}
 
 	/** Show table list.
 	 *
-	 * @param  DB     $db
-	 * @param  string $database
-	 * @return string $sql
+	 * @param	\IF_DATABASE $DB
+	 * @param	 string		 $database
+	 * @return	 string		 $sql
 	 */
 	static function Table($db, $database)
 	{
@@ -80,10 +79,10 @@ class Show
 
 	/** Show index list.
 	 *
-	 * @param  DB     $db
-	 * @param  string $database
-	 * @param  string $table
-	 * @return string $sql
+	 * @param	\IF_DATABASE $DB
+	 * @param	 string		 $database
+	 * @param	 string		 $table
+	 * @return	 string		 $sql
 	 */
 	static function Index($db, $database, $table)
 	{
@@ -94,7 +93,7 @@ class Show
 
 	/** Show user list.
 	 *
-	 * @param  \OP\UNIT\DB $DB
+	 * @param	\OP\UNIT\Database $DB
 	 */
 	static function User($DB)
 	{
@@ -111,7 +110,7 @@ class Show
 
 	/** Show user grant.
 	 *
-	 * @param	\IF_DATABASE $DB
+	 * @param	\OP\UNIT\Database $DB
 	 * @param	 string		 $user
 	 * @param	 string		 $host
 	 * @return	 string		 $query

@@ -33,9 +33,9 @@ class DML
 
 	/** Get table condition.
 	 *
-	 * @param  array
-	 * @param  db
-	 * @return string
+	 * @param   array
+	 * @param  \IF_DATABASE
+	 * @return  string
 	 */
 	static function Table($args, $db)
 	{
@@ -59,6 +59,8 @@ class DML
 		}else{
 			\Notice::Set("Has not been set table name.");
 		}
+
+		//	...
 		return $database.$table;
 	}
 
@@ -89,9 +91,9 @@ class DML
 
 	/** Get where condition.
 	 *
-	 * @param  array
-	 * @param  db
-	 * @return string
+	 * @param   array
+	 * @param  \IF_DATABASE
+	 * @return  string
 	 */
 	static function Where($args, $db)
 	{
@@ -187,10 +189,10 @@ class DML
 		return '('.join(' AND ', $join).')';
 	}
 
-	/** Get limit condition.
+	/** Generate limit condition.
 	 *
-	 * @param  array
-	 * @return string
+	 * @param	 array
+	 * @return	 string
 	 */
 	static function Limit($args)
 	{
@@ -201,21 +203,21 @@ class DML
 		return (int)$args['limit'];
 	}
 
-	/** Get offset condition.
+	/** Generate offset condition.
 	 *
-	 * @param  array
-	 * @return string
+	 * @param	 array	 $args
+	 * @return	 string
 	 */
 	static function Offset($args)
 	{
 		return (int)$args['offset'];
 	}
 
-	/** Get order condition.
+	/** Generate order condition.
 	 *
-	 * @param  array
-	 * @param  db
-	 * @return string
+	 * @param	 array
+	 * @param	\IF_DATABASE
+	 * @return	 string
 	 */
 	static function Order($args, $db)
 	{
