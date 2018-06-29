@@ -108,6 +108,7 @@ class Column
 		//	...
 		$field   = ifset($config['field']  );
 		$type    = ifset($config['type']   );
+		$unsigned= ifset($config['unsigned']);
 		$length  = ifset($config['length'] );
 		$default = ifset($config['default']);
 		$extra   = ifset($config['extra']  );
@@ -141,7 +142,12 @@ class Column
 		//	...
 		switch( $type = strtoupper($type) ){
 			case 'INT':
-				if( !$length ){ $length = 11; }
+			case 'TINYINT':
+			case 'SMALLINT':
+			case 'MEDIUMINT':
+			case 'BIGINT':
+				$length = (int)$length;
+				break;
 
 			case 'SET':
 			case 'ENUM':
@@ -153,11 +159,15 @@ class Column
 					}
 					$length = join(',', $join);
 				}
+				break;
 
 			case 'CHAR':
 			case 'VARCHAR':
-				if( !$length ){ throw new \Exception("Has not been set length. ($database, $table, $field, $type)"); }
-				$type = "{$type}({$length})";
+				if( $length ){
+					$length = (int)$length;
+				}else{
+					throw new \Exception("Has not been set length. ($field, $type)");
+				}
 				break;
 
 			case 'TIMESTAMP':
@@ -166,9 +176,23 @@ class Column
 				break;
 
 			default:
+				//	Why use regx?
+				if( strpos($type, 'UNSIGNED') ){
+					//	break
+				}else
 				if( preg_match('/[^A-Z]/', $type) ){
 					\Notice::Set("Has not been support this type. ($type)");
 				}
+		}
+
+		//	...
+		if( $length ){
+			$type = "$type($length)";
+		}
+
+		//	...
+		if( $unsigned ){
+			$type .= " UNSIGNED";
 		}
 
 		//	...
@@ -226,5 +250,52 @@ class Column
 
 		//	...
 		return "$key($field)";
+	}
+
+	/** Calc integer length.
+	 *
+	 * @param	 string		 $type
+	 * @param	 boolean	 $unsigned
+	 * @param	 integer	 $length
+	 * @return	 integer	 $length
+	 */
+	static function Length($type, $unsigned)
+	{
+		//	...
+		switch( strtolower($type) ){
+			case 'tinyint':
+				$length = 4;
+				break;
+
+			case 'smallint':
+				$length = 6;
+				break;
+
+			case 'mediumint':
+				$length = 8;
+				break;
+
+			case 'int':
+				$length = 11;
+				break;
+
+			case 'bigint':
+				$length = 20;
+				break;
+
+			case 'float':
+				$length = 0;
+				break;
+
+			default:
+		}
+
+		//	...
+		if( $unsigned and $length ){
+			$length--;
+		}
+
+		//	...
+		return $length ?? null;
 	}
 }
