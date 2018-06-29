@@ -97,7 +97,7 @@ class Show
 	 */
 	static function User($DB)
 	{
-		switch( $prod = $DB->Driver() ){
+		switch( $prod = $DB->Config()['prod'] ){
 			case 'mysql':
 				$sql = "SELECT host, user, password FROM mysql.user";
 				break;
@@ -117,8 +117,8 @@ class Show
 	 */
 	static function Grant($DB, $host, $user)
 	{
-		$user = $DB->GetPDO()->Quote($user);
-		$host = $DB->GetPDO()->Quote($host);
+		$user = $DB->PDO()->Quote($user);
+		$host = $DB->PDO()->Quote($host);
 		return "SHOW GRANTS FOR {$user}@{$host}";
 	}
 }
