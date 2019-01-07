@@ -66,9 +66,9 @@ class DML
 
 	/** Get set condition.
 	 *
-	 * @param  array
-	 * @param  db
-	 * @return string
+	 * @param	 array
+	 * @param	\IF_DATABASE $DB
+	 * @return	 string
 	 */
 	static function Set($args, $db)
 	{
@@ -77,6 +77,9 @@ class DML
 			\Notice::Set("Has not been set SET condition. ({$args['table']})");
 			return false;
 		}
+
+		//	...
+		$join = [];
 
 		//	...
 		foreach( $args['set'] as $column => $value ){
@@ -142,6 +145,9 @@ class DML
 			//	...
 			$column	 = $db->Quote($column);
 			$value	 = $db->PDO()->quote($value);
+
+			//	...
+			$join = [];
 
 			//	...
 			switch( $evalu = strtoupper($evalu) ){
@@ -232,6 +238,7 @@ class DML
 	 */
 	static function Order($args, $db)
 	{
+		$join = [];
 		foreach( explode(',', $args['order']) as $value ){
 			list($field, $order) = explode(' ', $value.' ');
 			$field  = $db->Quote($field);

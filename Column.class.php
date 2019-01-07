@@ -31,9 +31,9 @@ class Column
 
 	/** Create new column
 	 *
-	 * @param  string $column
-	 * @param  \DB    $db
-	 * @return string $sql
+	 * @param	 string		 $column
+	 * @param	\IF_DATABASE $db
+	 * @return	 string		 $sql
 	 */
 	static function Create($database, $table, $column, $config, $db)
 	{
@@ -50,12 +50,12 @@ class Column
 
 	/** Change exists column
 	 *
-	 * @param  string $database
-	 * @param  string $table
-	 * @param  string $column
-	 * @param  array  $config
-	 * @param  \DB    $DB
-	 * @return string $sql
+	 * @param	 string		 $database
+	 * @param	 string		 $table
+	 * @param	 string		 $column
+	 * @param	 array		 $config
+	 * @param	\IF_DATABASE $DB
+	 * @return	 string		 $sql
 	 */
 	static function Change($database, $table, $column, $config, $DB)
 	{
@@ -98,10 +98,10 @@ class Column
 
 	/** Generate each field SQL.
 	 *
-	 * @param	 array				 $config
-	 * @param	\OP\UNIT\Database	 $DB
-	 * @throws	\Exception			 $e
-	 * @return	 string				 $query
+	 * @param	 array		 $config
+	 * @param	\IF_DATABASE $DB
+	 * @throws	\Exception	 $e
+	 * @return	 string		 $query
 	 */
 	static function Field($config, $DB)
 	{
@@ -147,7 +147,7 @@ class Column
 			case 'MEDIUMINT':
 			case 'BIGINT':
 				$length = (int)$length;
-				break;
+			break;
 
 			case 'SET':
 			case 'ENUM':
@@ -159,7 +159,7 @@ class Column
 					}
 					$length = join(',', $join);
 				}
-				break;
+			break;
 
 			case 'CHAR':
 			case 'VARCHAR':
@@ -168,12 +168,12 @@ class Column
 				}else{
 					throw new \Exception("Has not been set length. ($field, $type)");
 				}
-				break;
+			break;
 
 			case 'TIMESTAMP':
 				$default = 'DEFAULT CURRENT_TIMESTAMP';
 				$extra   = 'ON UPDATE CURRENT_TIMESTAMP';
-				break;
+			break;
 
 			default:
 				//	Why use regx?
@@ -181,8 +181,9 @@ class Column
 					//	break
 				}else
 				if( preg_match('/[^A-Z]/', $type) ){
-					\Notice::Set("Has not been support this type. ($type)");
+					throw new \Exception("Has not been support this type. ($type)");
 				}
+			break;
 		}
 
 		//	...
@@ -202,6 +203,12 @@ class Column
 		return "$field $type $charset $default $extra $null COMMENT $comment";
 	}
 
+	/** Get column charset
+	 *
+	 * @param	 string		 $charset
+	 * @param	 string		 $collate
+	 * @return	 NULL|string $string
+	 */
 	static function Charset($charset, $collate)
 	{
 		//	...
@@ -235,11 +242,23 @@ class Column
 		return "CHARACTER SET {$charset} COLLATE {$collate}";
 	}
 
+	/** Get index string.
+	 *
+	 * @param	 array		 $config
+	 * @param	\IF_DATABASE $db
+	 * @throws	\Exception
+	 * @return	 NULL|string
+	 */
 	static function Index($config, $db)
 	{
 		//	...
 		if( empty($config['key']) ){
 			return null;
+		};
+
+		//	...
+		if( empty($config['field']) ){
+			throw new \Exception('Empty field name or index key type.');
 		}
 
 		//	...

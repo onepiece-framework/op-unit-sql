@@ -30,6 +30,12 @@ class User
 	 */
 	use \OP_CORE;
 
+	/** Create user
+	 *
+	 * @param	 array		 $config
+	 * @param	\IF_DATABASE $DB
+	 * @return	 boolean|string
+	 */
 	static function Create($config, $DB)
 	{
 		//	...
@@ -59,10 +65,29 @@ class User
 			$identified = 'WITH mysql_native_password';
 		}
 
-		//		CREATE USER  'user'@'host'  IDENTIFIED WITH mysql_native_password;
-		return "CREATE USER {$user}@{$host} IDENTIFIED $identified";
+		//	...
+		switch( $DB->Config()['prod'] ){
+			case 'mysql':
+				//      CREATE USER  'user'@'host'  IDENTIFIED WITH mysql_native_password;
+				return "CREATE USER {$user}@{$host} IDENTIFIED $identified";
+
+			case 'pgsql':
+				//	...
+				if( strpos($password, "'") !== false ){
+					throw new \Exception("Password has single quote character.");
+				};
+				//      CREATE ROLE   user  WITH LOGIN PASSWORD '  password ';
+				return "CREATE ROLE {$user} WITH LOGIN PASSWORD '{$password}'";
+				break;
+		};
 	}
 
+	/** Set password
+	 *
+	 * @param	 array		 $config
+	 * @param	\IF_DATABASE $DB
+	 * @return	 boolean|string
+	 */
 	static function Password($config, $DB)
 	{
 		//	...

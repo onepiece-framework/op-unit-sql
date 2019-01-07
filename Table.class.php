@@ -29,6 +29,12 @@ class Table
 	 */
 	use \OP_CORE;
 
+	/** Create table
+	 *
+	 * @param	 array		 $config
+	 * @param	\IF_DATABASE $DB
+	 * @return	 boolean|string
+	 */
 	static function Create($config, $DB)
 	{
 		//	...
@@ -56,8 +62,8 @@ class Table
 			$col[] = Column::Field($field, $DB);
 
 			//	...
-			if( $temp = Column::Index($field, $DB) ){
-				$ind[] = $temp;
+			if( isset($field['key']) /* or isset($field['index']) */ ){
+				$ind[] = Column::Index($field, $DB);
 			}
 		}
 		$columns = join(', ', array_merge($col, $ind));
@@ -73,6 +79,9 @@ class Table
 		return "CREATE TABLE $database.$table ($columns) ENGINE=$engine DEFAULT CHARSET=$charset COLLATE $collate";
 	}
 
+	/** Change table
+	 *
+	 */
 	static function Change()
 	{
 		//	ALTER DATABASE {DB名} CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;

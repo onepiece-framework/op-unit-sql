@@ -30,8 +30,17 @@ class Index
 	 */
 	use \OP_CORE;
 
+	/** Create index
+	 *
+	 * @param	\IF_DATABASE $DB
+	 * @param	 array		 $config
+	 * @return	 string
+	 */
 	static function Create($DB, $config)
 	{
+		//	...
+		$join = [];
+
 		//	...
 		$database = ifset($config['database']);
 		$table    = ifset($config['table']   );
@@ -61,6 +70,15 @@ class Index
 		return "ALTER TABLE $database.$table ADD $type $name ($columns)";
 	}
 
+	/** Drop index
+	 *
+	 * @param	 string		 $database
+	 * @param	 string		 $table
+	 * @param	 string		 $name
+	 * @param	 string		 $type
+	 * @param	\IF_DATABASE $DB
+	 * @return	 string		 $sql
+	 */
 	static function Drop($database, $table, $name, $type, $db)
 	{
 		//	...
