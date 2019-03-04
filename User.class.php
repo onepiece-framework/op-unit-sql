@@ -30,7 +30,7 @@ class User
 	 */
 	use \OP_CORE;
 
-	/** Create user
+	/** Create user.
 	 *
 	 * @param	 array		 $config
 	 * @param	\IF_DATABASE $DB
@@ -65,24 +65,11 @@ class User
 			$identified = 'WITH mysql_native_password';
 		}
 
-		//	...
-		switch( $DB->Config()['prod'] ){
-			case 'mysql':
-				//      CREATE USER  'user'@'host'  IDENTIFIED WITH mysql_native_password;
-				return "CREATE USER {$user}@{$host} IDENTIFIED $identified";
-
-			case 'pgsql':
-				//	...
-				if( strpos($password, "'") !== false ){
-					throw new \Exception("Password has single quote character.");
-				};
-				//      CREATE ROLE   user  WITH LOGIN PASSWORD '  password ';
-				return "CREATE ROLE {$user} WITH LOGIN PASSWORD '{$password}'";
-				break;
-		};
+		//		CREATE USER  'user'@'host'  IDENTIFIED WITH mysql_native_password;
+		return "CREATE USER {$user}@{$host} IDENTIFIED $identified";
 	}
 
-	/** Set password
+	/** Set password.
 	 *
 	 * @param	 array		 $config
 	 * @param	\IF_DATABASE $DB
@@ -108,5 +95,47 @@ class User
 
 		//		SET PASSWORD FOR  'user'@'host'  = '***';
 		return "SET PASSWORD FOR {$user}@{$host} = PASSWORD({$password})";
+	}
+
+	/** Drop user.
+	 *
+	 * @param	 array		 $config
+	 * @param	\IF_DATABASE $DB
+	 * @return	 boolean|string
+	 */
+	static function Drop($config, $DB)
+	{
+		//	...
+		$host    = $config['host']    ?? null;
+		$user    = $config['user']    ?? null;
+		$cascade = $config['cascade'] ?? null;
+
+		//	...
+		$host = $DB->PDO()->Quote($host);
+		$user = $DB->PDO()->Quote($user);
+
+		//	...
+		switch( $prod = $DB->Config()['prod'] ){
+			case 'mysql':
+				//	...
+				$user = "{$user}@{$host}";
+				break;
+
+			case 'pgsql':
+				break;
+
+			case 'oracle':
+				$user .= $cascade ? ' CASCADE': '';
+				break;
+
+			case 'mssql':
+				break;
+
+			default:
+				throw new \Exception("Has not been support this product. ($prod)");
+		};
+
+		//	...
+		return "DROP USER {$user}";
 	}
 }

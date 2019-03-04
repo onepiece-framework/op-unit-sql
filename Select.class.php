@@ -32,11 +32,11 @@ class Select
 
 	/** Get select sql statement.
 	 *
-	 * @param   array       $config
-	 * @param  \IF_DATABASE $DB
-	 * @return  string      $SQL
+	 * @param	 array		 $config
+	 * @param	\IF_DATABASE $db
+	 * @return	 string		 $sql
 	 */
-	static function Get($args, $db=null)
+	static function Get(&$args, $db=null)
 	{
 		//	...
 		if(!$db){
@@ -49,10 +49,17 @@ class Select
 			return false;
 		}
 
+		/*
 		//	COLUMN
 		if(!$column = self::_Column($args, $db)){
 			return false;
 		}
+		*/
+
+		//	Field
+		if(!$field = self::_Field($args, $db) ){
+			$field = '*';
+		};
 
 		//	WHERE
 		if(!$where = DML::Where($args, $db) ){
@@ -64,6 +71,9 @@ class Select
 			return false;
 		}
 
+		//	GROUP
+		$group  = isset($args['group'])  ? DML::Group($args,  $db): null;
+
 		//	ORDER
 		$order  = isset($args['order'])  ? DML::Order($args,  $db): null;
 
@@ -71,16 +81,100 @@ class Select
 		$offset = isset($args['offset']) ? DML::Offset($args, $db): null;
 
 		//	...
-		return "SELECT {$column} FROM {$table} WHERE {$where} {$order} {$limit} {$offset}";
+		return "SELECT {$field} FROM {$table} WHERE {$where} {$group} {$order} {$limit} {$offset}";
+	}
+
+	/** Get field condition.
+	 *
+	 * @param	 array		 $args
+	 * @param	\IF_DATABASE $db
+	 * @return	 string		 $sql
+	 */
+	static private function _Field(array &$args, \IF_DATABASE $db)
+	{
+		//	...
+		$join = [];
+
+		//	...
+		if( is_string($args['field'] ?? null) ){
+			$args['field'] = explode(',', $args['field']);
+		}
+
+		//	...
+		foreach( $args['field'] ?? [] as $field ){
+			//	...
+			list($field, $alias) = explode(' as ', $field . ' as ');
+
+			//	Separate function.
+			if( $pos1 = strpos($field, '(') and $pos2 = strpos($field, ')') ){
+				$func = substr($field,       0,         $pos1);
+				$field= substr($field, $pos1+1, $pos2-$pos1-1);
+			}else{
+				$func = null;
+			}
+
+			//	Correspond include table name or multi field name.
+			$field = self::_Field_Escape($field, $db);
+
+			//	If has function.
+			if( $func ){
+				$func  = strtoupper($func);
+				$field = "{$func}($field)";
+			};
+
+			//	If has alias name.
+			if( $alias ){
+				$alias = $db->Quote(trim($alias));
+			};
+
+			//	...
+			$join[] = $alias ? "$field AS $alias": $field;
+		};
+
+		//	...
+		return count($join) ? join(', ', $join): null;
+	}
+
+	static private function _Field_Escape(string $field, \IF_DATABASE $db)
+	{
+		//	...
+		$join = [];
+
+		//	...
+		foreach( explode(',', $field) as $field ){
+			//	...
+			$field = trim($field);
+
+			//	If has table name.
+			if( strpos($field, '.') ){
+				//	Has table name.
+				list($table, $field) = explode('.', $field);
+				$table = $db->Quote(trim($table));
+				$field = $db->Quote(trim($field));
+				$field = "{$table}.{$field}";
+			}else if( $field === "' '" or $field === '" "' ){
+				//	Use concat function.
+				$field = "' '";
+			}else{
+				//	Field name only.
+				$field = $db->Quote(trim($field));
+			};
+
+			//	...
+			$join[] = $field;
+		};
+
+		//	...
+		return join(', ', $join);
 	}
 
 	/** Get column condition.
 	 *
-	 * @param	 array	 $args
-	 * @param	\PDO	 $pdo
-	 * @return	 string	 $sql
+	 * @param	 array		 $args
+	 * @param	\IF_DATABASE $db
+	 * @return	 string		 $sql
 	 */
-	static private function _Column($args, $pdo)
+	static private function _Column(array $args, \IF_DATABASE $db)
 	{
 		//	...
 		if( $column = ifset($args['column']) ){
@@ -104,7 +198,7 @@ class Select
 					$leng  = $en - $st;
 					$func  = strtoupper( substr($val,     0, $st)  );
 					$field = strtoupper( substr($val, $st+1, $leng));
-					$field = $pdo->quote(trim($field));
+					$field = $db->quote(trim($field));
 
 					//	...
 					$join[] = "$func($field)";
@@ -121,7 +215,7 @@ class Select
 				if( is_string($key) ){
 					$join[] = strtoupper($key)."($val)";
 				}else{
-					$join[] = $pdo->quote(trim($val));
+					$join[] = $db->quote(trim($val));
 				}
 			}
 

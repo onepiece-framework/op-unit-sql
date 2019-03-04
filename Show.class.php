@@ -33,11 +33,27 @@ class Show
 
 	/** Show database list.
 	 *
+	 * @param	\IF_DATABASE $DB
 	 * @return	 string		 $sql
 	 */
-	static function Database()
+	static function Database(\IF_DATABASE $DB)
 	{
-		return 'SHOW DATABASES';
+		//	...
+		switch( $prod = $DB->Config()['prod'] ){
+			case 'mysql':
+				$sql = 'SHOW DATABASES';
+				break;
+
+			case 'pgsql':
+				$sql = 'SELECT * FROM "pg_database"';
+				break;
+
+			default:
+				throw new \Exception("Has not been support this product. ($prod)");
+		};
+
+		//	...
+		return $sql;
 	}
 
 	/** Show table list.
@@ -46,10 +62,29 @@ class Show
 	 * @param	 string		 $database
 	 * @return	 string		 $sql
 	 */
-	static function Table($db, $database)
+	static function Table(\IF_DATABASE $DB, $database)
 	{
-		$database = $db->Quote($database);
-		return "SHOW TABLES FROM {$database}";
+		//	...
+		switch( $prod = $DB->Config()['prod'] ){
+			case 'mysql':
+				$database = $DB->Quote($database);
+				$sql = "SHOW TABLES FROM {$database}";
+				break;
+
+			case 'pgsql':
+				$sql = 'SELECT * FROM "pg_stat_user_tables"';
+				break;
+
+			case 'sqlite':
+				$sql = "SELECT * FROM 'sqlite_master' WHERE type='table'";
+				break;
+
+			default:
+				throw new \Exception("Has not been support this product. ($prod)");
+		};
+
+		//	...
+		return $sql;
 	}
 
 	/** Show column list
@@ -62,19 +97,29 @@ class Show
 	static function Column($DB, $database, $table)
 	{
 		//	...
-		static $_cache;
+		switch( $prod = $DB->Config()['prod'] ){
+			case 'mysql':
+				$database = $DB->Quote($database);
+				$table    = $DB->Quote($table);
+				$sql = "SHOW FULL COLUMNS FROM {$database}.{$table}";
+				break;
+
+			case 'pgsql':
+				$table    = $DB->PDO()->quote($table);
+				$sql = "SELECT * FROM information_schema.columns WHERE table_name = {$table}";
+				break;
+
+			case 'sqlite':
+				$table    = $DB->Quote($table);
+				$sql = "PRAGMA TABLE_INFO({$table})";
+				break;
+
+			default:
+				throw new \Exception("This product has not been support. ($prod)");
+		};
 
 		//	...
-		if( isset( $_cache[$database][$table]) ){
-			return $_cache[$database][$table];
-		}
-
-		//	...
-		$database = $DB->Quote($database);
-		$table    = $DB->Quote($table);
-
-		//	...
-		return $_cache[$database][$table] = "SHOW FULL COLUMNS FROM {$database}.{$table}";
+		return $sql;
 	}
 
 	/** Show index list.
@@ -86,20 +131,43 @@ class Show
 	 */
 	static function Index($db, $database, $table)
 	{
-		$database = $db->Quote($database);
-		$table    = $db->Quote($table);
-		return "SHOW INDEX FROM {$database}.{$table}";
+		if( 1 ){
+			$database = $db->Quote($database);
+			$table    = $db->Quote($table);
+			return "SHOW INDEX FROM {$database}.{$table}";
+		}else{
+			//	...
+			if( $database ){
+				$database = 'table_schema='.$db->PDO()->Quote($database);
+			};
+
+			//	...
+			if( $table ){
+				$database.= ' AND ';
+				$database.= 'table_name='  .$db->PDO()->Quote($table);
+			};
+
+			//	...
+			return "SELECT * FROM information_schema.statistics WHERE {$database}";
+		};
 	}
 
 	/** Show user list.
 	 *
 	 * @param	\IF_DATABASE $DB
 	 */
-	static function User($DB)
+	static function User($config, $DB)
 	{
 		switch( $prod = $DB->Config()['prod'] ){
 			case 'mysql':
-				$sql = "SELECT host, user, password FROM mysql.user";
+				//	MySQL 5.6
+				$sql = "SELECT `host`, `user`, `password` FROM `mysql`.`user`";
+				//	MySQL 5.7
+			//	$sql = "SELECT `host`, `user`             FROM `mysql`.`user`";
+				break;
+
+			case 'pgsql':
+				$sql = 'SELECT * FROM "pg_shadow"';
 				break;
 
 			default:

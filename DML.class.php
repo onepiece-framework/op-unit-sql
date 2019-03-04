@@ -37,46 +37,150 @@ class DML
 	 * @param  \IF_DATABASE
 	 * @return  string
 	 */
-	static function Table($args, $db)
+	static function Table(array $args, \IF_DATABASE $db)
 	{
 		//	...
-		$database = ifset($args['database']);
-
-		//	...
-		if( $table = ifset($args['table']) ){
-			//	test.t_test
-			if( $pos = strpos($table, '.') ){
-				//	test.t_test --> test, t_test
-				$database = substr($table, 0, $pos);
-				$table    = substr($table, $pos+1);
-			}
-
-			//	...
-			$database = $database ? $db->Quote($database).'.': null;
-
-			//	...
-			$table = $db->Quote($table);
-		}else{
+		if( empty($args['table']) ){
 			\Notice::Set("Has not been set table name.");
-		}
+			return false;
+		};
 
 		//	...
-		return $database.$table;
+		if( strpos($args['table'], '=') ){
+			return self::_TableJoins($args, $db);
+		}else{
+			return self::_Table($args, $db);
+		};
+	}
+
+	static private function _Table(array $args, \IF_DATABASE $db)
+	{
+		//	...
+		$table = $args['table'];
+
+		//	database_name.table_name
+		if( $pos = strpos($table, '.') ){
+			//	database_name.table_name --> database_name, table_name
+			$database = substr($table, 0, $pos);
+			$table    = substr($table, $pos+1);
+		};
+
+		//	...
+		$table = $db->Quote($table);
+
+		//	...
+		if( $db->Config()['prod'] === 'mysql' and empty($database) ){
+			$database = $args['database'] ?? null;
+		};
+
+		//	...
+		if(!empty($database) ){
+			$table = $db->Quote($database).'.'.$table;
+		};
+
+		//	...
+		return $table;
+	}
+
+	static private function _TableJoin(string $table, \IF_DATABASE $db, $flag)
+	{
+		//	...
+		$join = $match = null;
+
+		//	...
+		preg_match("/([\w\.]+)\s*([<>=]+)\s*([\w\.]+)/", $table, $match);
+
+		//	...
+		$join['left']  = explode('.', $match[1]);
+		$join['right'] = explode('.', $match[3]);
+
+		//	...
+		switch( $match[2] ){
+			case '=':
+			case '<=':
+				$eval = 'LEFT';
+				break;
+			case '=>':
+				$eval = 'RIGHT';
+				break;
+			case '>=<':
+				$eval = 'INNER';
+				break;
+			case '<=>':
+				$eval = 'OUTER';
+				break;
+		};
+
+		//	...
+		$table1 = $db->Quote($join['left'][0] );
+		$field1 = $db->Quote($join['left'][1] );
+		$table2 = $db->Quote($join['right'][0]);
+		$field2 = $db->Quote($join['right'][1]);
+
+		//	...
+		$table0 = $flag ? null: $table1;
+
+		//	...
+		return "$table0 $eval JOIN $table2 ON $table1.$field1 = $table2.$field2";
+	}
+
+	static private function _TableJoins(array $args, \IF_DATABASE $db)
+	{
+		//	...
+		$join = [];
+
+		//	...
+		foreach( explode(',', $args['table']) as $table ){
+			$join[] = self::_TableJoin($table, $db, count($join));
+		};
+
+		//	...
+		return join(' ', $join);
+	}
+
+	/** Get VALUES
+	 *
+	 * @param	 array		 $args
+	 * @param	\IF_DATABASE $db
+	 * @return 	 array		 $sql
+	 */
+	static function Values(array $args, \IF_DATABASE $db): array
+	{
+		//	...
+		if( empty($args['values']) ){
+			\Notice::Set("Has not been set values. ({$args['table']})");
+			return [];
+		};
+
+		//	...
+		$fields = $values = [];
+
+		//	...
+		foreach( $args['values'] as $field => $value ){
+			$fields[] = $db->Quote($field);
+			$values[] = $db->PDO()->Quote($value);
+		};
+
+		//	...
+		$fields =         '('.join(', ', $fields).')';
+		$values = ' VALUES ('.join(', ', $values).')';
+
+		//	...
+		return [$fields, $values];
 	}
 
 	/** Get set condition.
 	 *
-	 * @param	 array
+	 * @param	 array		 $args
 	 * @param	\IF_DATABASE $DB
-	 * @return	 string
+	 * @return	 string		 $sql
 	 */
-	static function Set($args, $db)
+	static private function _Set($args, $db)
 	{
 		//	...
-		if( empty($args['set']) ){
-			\Notice::Set("Has not been set SET condition. ({$args['table']})");
-			return false;
-		}
+		if( isset($args['set'][0]) ){
+			return self::_Set0($args, $db);
+		};
 
 		//	...
 		$join = [];
@@ -107,6 +211,51 @@ class DML
 		return join(', ', $join);
 	}
 
+	/** Get set condition.
+	 *
+	 * @param	 array		 $args
+	 * @param	\IF_DATABASE $DB
+	 * @return	 string		 $sql
+	 */
+	static private function _Set0($args, $db)
+	{
+		//	...
+		$join  = [];
+		$match = null;
+
+		//	...
+		foreach( $args['set'] as $str ){
+			if( preg_match('/([_a-z0-9]+)\s*=\s*(.+)/i', ltrim($str), $match) ){
+				$field  = $db->Quote($match[1]);
+				$value  = $db->PDO()->quote($match[2]);
+				$join[] = "{$field} = {$value}";
+			}else{
+				\Notice::Set("Unmatch format. ($str)");
+			};
+		};
+
+		//	...
+		return join(', ', $join);
+	}
+
+	/** Get set condition.
+	 *
+	 * @param	 array
+	 * @param	\IF_DATABASE $DB
+	 * @return	 string
+	 */
+	static function Set($args, $db)
+	{
+		//	...
+		if( empty($args['set']) ){
+			\Notice::Set("Has not been set SET condition. ({$args['table']})");
+			return false;
+		}
+
+		//	...
+		return 'SET ' . self::_Set($args, $db);
+	}
+
 	/** Get where condition.
 	 *
 	 * @param   array
@@ -128,6 +277,11 @@ class DML
 		}
 
 		//	...
+		if( isset($args['where'][0]) ){
+			return self::Where2($args, $db);
+		};
+
+		//	...
 		foreach( $args['where'] as $column => $condition ){
 			if( is_array($condition) ){
 				$evalu = ifset($condition['evalu'], '=');
@@ -139,7 +293,7 @@ class DML
 
 			//	...
 			if( $value === null ){
-				$evalu = $evalu === '=' ? 'IS NULL':'IS NOT NULL';
+				$evalu = ($evalu === '=') ? 'IS NULL':'IS NOT NULL';
 			}
 
 			//	...
@@ -206,38 +360,158 @@ class DML
 		return '('.join(' AND ', $join).')';
 	}
 
+	/** Get where condition version 2.
+	 *
+	 * @param	 array		 $args
+	 * @param	\IF_DATABASE $db
+	 * @return	 string		 $where
+	 */
+	static function Where2(array $args, \IF_DATABASE $db)
+	{
+		//	...
+		$join  = [];
+		$match = null;
+
+		//	...
+		foreach($args['where'] as $str){
+			//	...
+			if(!preg_match('/(\w+\.?\w*)\s+([^\s]+)\s+(.+)/i', $str, $match) ){
+				\Notice::Set("Does not match format. ($str)");
+				continue;
+			};
+
+			//	...
+			$field = $match[1];
+			$evalu = $match[2];
+			$value = $match[3];
+			$crude = trim($value);
+
+			//	...
+			if( strpos($field, '.') ){
+				list($table,$field) = explode('.', $field);
+				$field = $db->Quote($table) .'.'. $db->Quote($field);
+			}else{
+				$field = $db->Quote($field);
+			};
+
+			//	...
+			$value = $db->PDO()->quote($value);
+
+			//	...
+			switch( $evalu = strtoupper($evalu) ){
+				//	NULL
+				case '!IS':
+				case 'NOT':
+					$evalu = 'IS NOT';
+				//	break;
+				case 'IS':
+					if( 'NULL' === strtoupper($crude) ){
+						$value = 'NULL';
+					};
+					break;
+
+				//	IN
+				case '!IN':
+				case 'NOTIN':
+					$evalu = 'NOT IN';
+					//	break;
+				case 'IN':
+					$j = [];
+					foreach( explode(',', $value) as $v ){
+						$v = $db->PDO()->quote(trim($v));
+					};
+					$value = '('.join(',', $j).')';
+					break;
+
+				//	LIKE
+				case '!LIKE':
+				case 'NOTLIKE':
+					$evalu = 'NOT LIKE';
+					//	break;
+				case 'LIKE':
+					break;
+
+				//	BETWEEN
+				case 'BETWEEN':
+					break;
+
+				//	...
+				case '=':
+				case '>':
+				case '<':
+				case '>=':
+				case '<=':
+					break;
+
+				//	...
+				default:
+					\Notice::Set("This evaluation was not supported. ($evalu)");
+					return false;
+			};
+
+			//	...
+			$join[] = "{$field} {$evalu} {$value}";
+		};
+
+		//	...
+		return '('.join(' AND ', $join).')';
+	}
+
 	/** Generate limit condition.
-	 *
-	 * @param	 array
-	 * @return	 string
-	 */
-	static function Limit($args)
-	{
-		if(!isset($args['limit']) ){
-			\Notice::Set("Has not been set LIMIT condition. ({$args['table']})");
-			return false;
-		}
-		return 'LIMIT '.(int)$args['limit'];
-	}
-
-	/** Generate offset condition.
-	 *
-	 * @param	 array	 $args
-	 * @return	 string
-	 */
-	static function Offset($args)
-	{
-		return 'OFFSET ' . (int)$args['offset'];
-	}
-
-	/** Generate order condition.
 	 *
 	 * @param	 array
 	 * @param	\IF_DATABASE
 	 * @return	 string
 	 */
+	static function Limit($args, $db)
+	{
+		//	...
+		if(!isset($args['limit']) ){
+			\Notice::Set("Has not been set limit. ({$args['table']})");
+			return null;
+		};
+
+		//	...
+		$limit = (int)$args['limit'];
+
+		//	...
+		return "LIMIT {$limit}";
+	}
+
+	/** Generate offset condition.
+	 *
+	 * @param	 array		 $args
+	 * @param	\IF_DATABASE $db
+	 * @return	 string		 $sql
+	 */
+	static function Offset($args, $db)
+	{
+		//	...
+		if(!isset($args['offset']) ){
+			return null;
+		};
+
+		//	...
+		$offset = (int)$args['offset'];
+
+		//	...
+		return "OFFSET {$offset}";
+	}
+
+	/** Generate order condition.
+	 *
+	 * @param	 array		 $args
+	 * @param	\IF_DATABASE $db
+	 * @return	 string		 $sql
+	 */
 	static function Order($args, $db)
 	{
+		//	...
+		if(!isset($args['order']) ){
+			return null;
+		};
+
+		//	...
 		$join = [];
 		foreach( explode(',', $args['order']) as $value ){
 			list($field, $order) = explode(' ', $value.' ');
@@ -248,5 +522,34 @@ class DML
 
 		//	...
 		return "ORDER BY ".join(', ', $join);
+	}
+
+	/** Generate group condition.
+	 *
+	 * @param	 array		 $args
+	 * @param	\IF_DATABASE $db
+	 * @return	 string		 $sql
+	 */
+	static function Group($args, $db)
+	{
+		//	...
+		if(!$group = $args['group'] ?? null ){
+			return null;
+		};
+
+		//	If has table name.
+		if( strpos($group, '.') ){
+			//	Has table name.
+			list($table, $field) = explode('.', $group);
+			$table = $db->Quote(trim($table));
+			$field = $db->Quote(trim($field));
+			$group = "{$table}.{$field}";
+		}else{
+			//	Field name only.
+			$group = $db->Quote(trim($group));
+		};
+
+		//	...
+		return "GROUP BY {$group}";
 	}
 }

@@ -37,7 +37,7 @@ class Insert
 	 * @param	\IF_DATABASE
 	 * @return	 string
 	 */
-	static function Get($args, $db=null)
+	static function Get(array $args, \IF_DATABASE $db=null)
 	{
 		//	...
 		if(!$db){
@@ -46,35 +46,71 @@ class Insert
 		}
 
 		//	TABLE
-		if( $table = ifset($args['table']) ){
-			$table = $db->Quote($table);
-		}else{
-			\Notice::Set("Has not been set table name.");
+		if(!$table = DML::Table($args, $db) ){
 			return false;
-		}
-
-		//	SET
-		if(!$set = DML::set($args, $db)){
-			\Notice::Set("Has not been set condition. ($table)");
-			return false;
-		}
-
-		//	ON DUPLICATE KEY UPDATE
-		if( $update = ifset($args['update']) ){
-			if(!is_string($update) ){
-				\Notice::Set('The "ON DUPLICATE KEY UPDATE" is not string. (Please set of field name)');
-				return false;
-			}
-			$dml = [];
-			$dml['table'] = $args['table']; // For error message.
-			foreach( explode(',', $update) as $key ){
-				$key = trim($key);
-				$dml['set'][$key] = $args['set'][$key];
-			}
-			$update = "ON DUPLICATE KEY UPDATE " . DML::Set($dml, $db);
 		}
 
 		//	...
-		return "INSERT INTO {$table} SET {$set} {$update}";
+		$set = $fields = $values = null;
+
+		//	...
+		if( $db->Config()['prod'] === 'mysql' ){
+			//	SET
+			if(!$set = DML::Set($args, $db)){
+				return false;
+			};
+		}else{
+			//	...
+			if( empty($args['values']) and isset($args['set']) ){
+				$args['values'] = $args['set'];
+				unset($args['set']);
+			};
+
+			//	VALUES
+			list($fields, $values) = DML::Values($args, $db);
+
+			//	...
+			if( empty($fields) or empty($values) ){
+				return false;
+			};
+		};
+
+		//	ON DUPLICATE KEY UPDATE
+		if( $update = $args['update'] ?? null ){
+			//	...
+			if(!is_string($update) ){
+				\Notice::Set('"ON DUPLICATE KEY UPDATE" is not string. (Please set of field name)');
+				return false;
+			}
+
+			//	...
+			$dml = [];
+			$dml['table'] = $args['table'];
+
+			//	...
+			if( isset($args['set'][0]) ){
+				$temp = [];
+				foreach( $args['set'] as $str ){
+					$pos = strpos($str, '=');
+					$key = substr($str, 0, $pos);
+					$val = substr($str, $pos+1);
+					$temp[trim($key)] = trim($val);
+				};
+			}else{
+				$set = $args['set'];
+			};
+
+			//	...
+			foreach( explode(',', $update) as $key ){
+				$key = trim($key);
+				$dml['set'][$key] = $temp[$key];
+			};
+
+			//	...
+			$update = "ON DUPLICATE KEY UPDATE " . DML::_Set($dml, $db);
+		};
+
+		//	...
+		return "INSERT INTO {$table}{$fields}{$values}{$set} {$update}";
 	}
 }
