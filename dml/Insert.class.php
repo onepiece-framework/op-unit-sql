@@ -74,6 +74,11 @@ class Insert
 			$set = Common::Set($config['set'], $_DB);
 		};
 
+		//	Values
+		if( isset($config['values']) ){
+			$set = Common::Values($config['set'], $_DB);
+		};
+
 		//	...
 		if( $config['update'] ?? null ){
 			$update = self::_Update($config, $_DB);
