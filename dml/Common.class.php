@@ -335,11 +335,19 @@ class Common
 	 */
 	static function Where($where, $_DB)
 	{
+		/*
+		if(!is_array($where) ){
+			throw new \Exception("Where is not array. ($where)");
+		};
+		*/
+
 		//	...
 		$join  = [];
 		$match = null;
 
 		//	Each where.
+
+		/*
 		foreach( $where as $field => $str ){
 			//	Which new or old format.
 			if( preg_match('/(\w+\.?\w*)\s+([^\s]+)\s+(.+)/i', $str, $match) ){
@@ -353,8 +361,35 @@ class Common
 				$evalu = '=';
 				$value = $str;
 			};
+		*/
+
+		foreach($where as $key => $str){
+
+			//	If old style.
+			if( is_string($key) ){
+				if( $str === null ){
+					$str = " $key is null ";
+				}else{
+					$str = " $key = $str ";
+				};
+			};
+
+			//	...
+			if( preg_match('/(\w+\.?\w*)\s+([^\s]+)\s+(.+)/i', $str, $match) ){
+				//	t_table.field (=|is) value
+			}else if( preg_match('/(\w+\.?\w*)\s*([=<>]+)\s*(.+)/i', $str, $match) ){
+				//	t_table.field=value
+			}else{
+				throw new Exception("Unmatch where format. ($str)");
+			};
 
 			//	Force quote.
+			$field = $match[1];
+			$evalu = $match[2];
+			$value = $match[3];
+			$value = trim($value);
+
+			//	...
 			if( strpos($field, '.') ){
 				//	t_table.field_name
 				list($table,$field) = explode('.', $field);
