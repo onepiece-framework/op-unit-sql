@@ -69,7 +69,10 @@ class Insert
 		$table = Common::Table($config['table'] ?? null, $_DB);
 
 		//	SET
-		$set = Common::Set($config['set'] ?? null, $_DB);
+		if( isset($config['set']) ){
+			$config['set'] = Common::SetUniform($config['set']);
+			$set = Common::Set($config['set'], $_DB);
+		};
 
 		//	...
 		if( $config['update'] ?? null ){
