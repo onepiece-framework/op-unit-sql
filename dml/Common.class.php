@@ -140,9 +140,9 @@ class Common
 
 	/** Set
 	 *
-	 * @param  array       $config
-	 * @param  IF_DATABASE $_DB
-	 * @return string
+	 * @param   array       $config
+	 * @param   IF_DATABASE $_DB
+	 * @return  string
 	 */
 	static function Set($set, IF_DATABASE $_DB)
 	{
@@ -150,42 +150,21 @@ class Common
 		$join  = [];
 
 		//	...
-		$match = null;
-
-		//	...
-		foreach( $set as $key => $str ){
+		foreach( $set as $field => $array ){
 			//	...
-			if( is_array($str) ){
-				$str = join(',', $str);
-				/*
-				throw new Exception("Value is array. (Field: $key)");
-				*/
-			};
-
-			/** This is OLD style. But.
-			 *  correspond to white space at begin or end of line.
-			 */
-			if(!is_numeric($key) ){
-				$field = $key;
-				$value = $str;
-			}else
-
-			//	...
-			if( preg_match('/([_a-z0-9]+)\s*=\s*(.+)/i', ltrim($str), $match) ){
-				$field = $match[1];
-				$value = $match[2];
-			}else{
-				throw new Exception("Not match format. ($str)");
-			};
-
-			//	...
-			$field = $_DB->Quote( trim($field) );
+			$field = $_DB->Quote($field);
+			$evalu = $array['evalu'];
+			$value = $array['value'];
 
 			//	...
 			if( $value === null ){
+				$evalu = '=';
 				$value = 'NULL';
+			}else if( $evalu === '+' or $evalu === '-' ){
+				$value = "{$field} {$evalu} " . (int)$value;
 			}else{
-				$value = $_DB->PDO()->quote( trim($value) );
+				$evalu = '=';
+				$value = $_DB->PDO()->quote($value);
 			};
 
 			//	...
