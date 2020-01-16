@@ -525,9 +525,23 @@ class Common
 
 		//	...
 		foreach( $order as $value ){
-			list($field, $order) = explode(' ', $value.' ');
-			$field  = $_DB->Quote($field);
+			//	...
+			list($field, $order) = explode(' ', trim($value).' ');
+
+			//	...
+			if( strpos($field, '.') ){
+				//	table.field --> table, field
+				list($table, $field) = explode('.', $field);
+				$field  = $_DB->Quote($table).'.'.$_DB->Quote($field);
+			}else{
+				//	...
+				$field  = $_DB->Quote($field);
+			};
+
+			//	...
 			$field .= $order === 'desc' ? ' DESC':'';
+
+			//	...
 			$join[] = $field;
 		}
 
