@@ -337,9 +337,19 @@ class Column
 				}
 			break;
 
+			//	...
 			case 'TIMESTAMP':
-				$default = 'DEFAULT CURRENT_TIMESTAMP';
-				$extra   = 'ON UPDATE CURRENT_TIMESTAMP';
+				//	...
+				if( 'CURRENT_TIMESTAMP' === strtoupper($config['default']) ){
+					$null    = null;
+					$default = null;
+				};
+
+				//	...
+				if( $null !== 'NULL' and $default === null ){
+					$default = 'DEFAULT CURRENT_TIMESTAMP';
+					$extra   = 'ON UPDATE CURRENT_TIMESTAMP';
+				};
 			break;
 
 			default:
