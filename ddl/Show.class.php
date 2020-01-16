@@ -140,21 +140,21 @@ class Show implements IF_SQL_DDL_SHOW
 			};
 		};
 
-		//	Force quote.
-		$database = $this->_DB->Quote($database);
-		$table    = $this->_DB->Quote($table);
-
 		//	Branch to each database.
 		switch( $prod = $this->_DB->Config()['prod'] ){
 			case 'mysql':
+				$database = $this->_DB->Quote($database);
+				$table    = $this->_DB->Quote($table   );
 				$sql = "SHOW FULL COLUMNS FROM {$database}.{$table}";
 				break;
 
 			case 'pgsql':
+				$table    = $this->_DB->PDO()->quote($table);
 				$sql = "SELECT * FROM information_schema.columns WHERE table_name = {$table}";
 				break;
 
 			case 'sqlite':
+				$table    = $this->_DB->Quote($table);
 				$sql = "PRAGMA TABLE_INFO({$table})";
 				break;
 
