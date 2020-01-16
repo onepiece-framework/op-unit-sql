@@ -516,10 +516,15 @@ class Common
 		};
 
 		//	...
+		if( is_string($order) ){
+			$order = explode(',', $order);
+		};
+
+		//	...
 		$join = [];
 
 		//	...
-		foreach( explode(',', $order) as $value ){
+		foreach( $order as $value ){
 			list($field, $order) = explode(' ', $value.' ');
 			$field  = $_DB->Quote($field);
 			$field .= $order === 'desc' ? ' DESC':'';
