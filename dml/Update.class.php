@@ -62,7 +62,7 @@ class Update
 		$limit = Common::Limit($config['limit'], $_DB);
 
 		//	SET
-		$set   = Common::Set($config['set'], $_DB);
+		$set   = Common::Set(Common::SetUniform($config['set']), $_DB);
 
 		//	OFFSET
 		if( isset($config['offset']) ){
