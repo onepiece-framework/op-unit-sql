@@ -175,6 +175,50 @@ class Common
 		return 'SET ' . join(', ', $join);
 	}
 
+	/** To uniform old style and new style.
+	 *
+	 * @param  array $set
+	 * @return array $set
+	 */
+	static function SetUniform($set)
+	{
+		//	...
+		$_set  = null;
+		$match = null;
+
+		//	...
+		foreach( $set as $field => $value ){
+			//	...
+			if( is_array($value) ){
+				$evalu = $value['evalu'];
+				$value = $value['value'];
+			}else if( is_numeric($field) ){
+				if( preg_match('/([_a-z0-9]+)\s*(=|\+|-|is)\s*(.+)/is', trim($value), $match) ){
+					//	...
+					$field = $match[1];
+					$evalu = $match[2];
+					$value = $match[3];
+
+					//	...
+					if(($evalu === 'is') and ('null' === strtolower($value))){
+						$value = null;
+					};
+				}else{
+					throw new Exception("Not match format. ($value)");
+				}
+			}else{
+				$evalu = '=';
+				$field = trim($field);
+			};
+
+			//	...
+			$_set[$field] = ['evalu'=>$evalu, 'value'=>$value];
+		};
+
+		//	...
+		return $_set;
+	}
+
 	/** Values
 	 *
 	 * @param  array       $config
