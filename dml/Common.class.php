@@ -410,7 +410,7 @@ class Common
 					$evalu = 'IS NOT';
 					//	break;
 				case 'IS':
-					if( 'NULL' === strtoupper( trim($value, $value[0])) ){
+					if( 'NULL' === strtoupper(substr($value, 1, -1)) ){
 						$value = 'NULL';
 					};
 					break;
