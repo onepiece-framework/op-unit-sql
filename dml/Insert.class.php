@@ -98,6 +98,7 @@ class Insert
 		//	...
 		$sets = null;
 
+		/*
 		//	...
 		foreach( explode(',', $config['update'] ?? null) as $field ){
 			//	...
@@ -112,6 +113,34 @@ class Insert
 				};
 			};
 		};
+		*/
+
+		//	Correspond to string and array
+		if( is_string($config['update']) ){
+			$config['update'] = explode(',', $config['update']);
+		};
+
+		//	Update value can be set freely.
+		foreach( $config['update'] as $field => $value ){
+			//	...
+			$value = trim($value);
+
+			//	...
+			if( $config['set'][$value] ?? null ){
+				$field = $value;
+				$value = $config['set'][$value];
+			}
+
+			//	...
+			if( is_string($field) ){
+				$sets[$field] = $value;
+			}else{
+				$sets[] = $value;
+			}
+		}
+
+		//
+		$sets = Common::SetUniform($sets);
 
 		//	...
 		return "ON DUPLICATE KEY UPDATE " . substr(Common::Set($sets, $_DB), 4);
