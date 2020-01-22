@@ -136,8 +136,8 @@ class Show implements IF_SQL_DDL_SHOW
 			//	Trim white space.
 			${$key} = trim(${$key});
 
-			//	Check if string has quote.
-			if( preg_match('/^[^_a-z]/i', ${$key}) ){
+			//	Check if first character is quote.
+			if( preg_match('/^[^_a-z0-9]/i', ${$key}) ){
 				//	Trim quote string. `t_table` --> t_table
 				${$key} = substr(${$key}, 1, strlen(${$key})-2);
 			};
