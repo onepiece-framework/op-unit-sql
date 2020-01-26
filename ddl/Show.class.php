@@ -134,7 +134,7 @@ class Show implements IF_SQL_DDL_SHOW
 		//	Loop at each key string.
 		foreach(['database','table'] as $key){
 			//	Trim white space.
-			$key = trim(${$key});
+			${$key} = trim(${$key});
 
 			//	Check if string has quote.
 			if( preg_match('/^[^_a-z]/i', ${$key}) ){
