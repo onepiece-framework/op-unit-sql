@@ -432,7 +432,7 @@ class Common
 					};
 					break;
 
-					//	IN
+				//	IN
 				case '!IN':
 				case 'NOTIN':
 					$evalu = 'NOT IN';
@@ -445,15 +445,16 @@ class Common
 					$value = '('.join(',', $j).')';
 					break;
 
-					//	LIKE
+				//	LIKE
 				case '!LIKE':
 				case 'NOTLIKE':
 					$evalu = 'NOT LIKE';
 					//	break;
 				case 'LIKE':
+					$value = str_replace('_', '\_', $value);
 					break;
 
-					//	BETWEEN
+				//	BETWEEN
 				case 'BETWEEN':
 					break;
 
