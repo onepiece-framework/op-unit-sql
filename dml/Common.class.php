@@ -463,6 +463,7 @@ class Common
 				case '<':
 				case '>=':
 				case '<=':
+				case '!=':
 					break;
 
 					//	...
