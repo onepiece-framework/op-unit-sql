@@ -374,6 +374,12 @@ class Common
 			};
 		*/
 
+		//	...
+		if( is_string($where) ){
+			$where = [$where];
+		}
+
+		//	...
 		foreach($where as $key => $str){
 
 			//	If old style.
