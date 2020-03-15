@@ -495,6 +495,11 @@ class Common
 		};
 
 		//	...
+		if( -1 === (int)$limit){
+			return null;
+		}
+
+		//	...
 		$limit = (int)$limit;
 
 		//	...
