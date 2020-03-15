@@ -66,14 +66,25 @@ class Common
 		return $table;
 	}
 
-	static private function _Table_Joins(string $table, IF_DATABASE $_DB)
+	/** Join each table.
+	 *
+	 * @param   string|array
+	 * @param   IF_DATABASE
+	 * @return  string
+	 */
+	static private function _Table_Joins($tables, IF_DATABASE $_DB)
 	{
+		//	...
+		if( is_string($tables) ){
+			$tables = explode(',', $tables);
+		}
+
 		//	...
 		$join = [];
 
 		//	...
-		foreach( explode(',', $table) as $table ){
-			$join[] = self::_Table_Join($table, $_DB, count($join));
+		foreach( $tables as $table ){
+			$join[] = self::_Table_Join(trim($table), $_DB, count($join));
 		};
 
 		//	...
@@ -131,7 +142,7 @@ class Common
 	static function Table($table, IF_DATABASE $_DB)
 	{
 		//	...
-		if( strpos($table, '=') ){
+		if( is_array($table) or strpos($table, '=') ){
 			return self::_Table_Joins($table, $_DB);
 		}else{
 			return self::_Table($table, $_DB);
