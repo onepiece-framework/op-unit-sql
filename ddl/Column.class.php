@@ -64,7 +64,7 @@ class Column
 	 * @param  array  $config
 	 * @return string $sql
 	 */
-	static function Create($config)
+	function Create($config)
 	{
 		//	...
 		if( 'auto_increment' === strtolower(ifset($config['extra'])) ){
@@ -76,7 +76,7 @@ class Column
 		}
 
 		//	...
-		return self::_Generate($config, 'ADD');
+		return $this->_Generate($config, 'ADD');
 	}
 
 	/** Change exists column
