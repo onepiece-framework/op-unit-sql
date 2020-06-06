@@ -70,7 +70,21 @@ class Create implements IF_SQL_DDL_CREATE
 	 */
 	public function Database(array $config)
 	{
+		//	Safety
+		unset($config['charset']);
+		unset($config['collate']);
 
+		//	...
+		$database = $config['database'] ??  null;
+		$charset  = $config['charset']  ?? 'utf8mb4';
+		$collate  = $config['collate']  ?? 'utf8mb4_general_ci';
+		$if_not_exists = 'IF NOT EXISTS';
+
+		//	...
+		$database = $this->_DB->Quote($database);
+
+		//	...
+		return "CREATE DATABASE {$if_not_exists} {$database} CHARACTER SET {$charset} COLLATE {$collate}";
 	}
 
 	/** Generate Create table SQL.
