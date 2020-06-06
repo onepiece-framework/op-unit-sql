@@ -52,6 +52,12 @@ class Select
 			};
 		};
 
+		//	Pager
+		if( isset($config['pager']) ){
+			require_once(__DIR__.'/function/Pager.php');
+			Pager($config);
+		}
+
 		//	TABLE
 		$table = Common::Table($config['table'], $_DB);
 
