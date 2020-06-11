@@ -62,6 +62,16 @@ class Insert
 
 	static private function _MySQL(array $config, IF_DATABASE $_DB)
 	{
+		//	...
+		if( empty($config['table']) ){
+			throw new \Exception('"table" is not set in config.');
+		}
+
+		//	...
+		if( empty($config['set']) ){
+			throw new \Exception('"set" is not set in config.');
+		}
+
 		//	Init
 		$fields = $values = $set = $update = null;
 
