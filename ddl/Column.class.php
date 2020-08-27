@@ -135,7 +135,7 @@ class Column
 		}
 
 		//	...
-		$common = self::Field($config, $this->_DB, $verb);
+		$field  = self::Field($config, $this->_DB, $verb);
 		$index  = self::Index($config, $this->_DB, $verb);
 
 		//	"PRIMARY KEY" can not been change.
@@ -153,7 +153,7 @@ class Column
 		$extra = ($config['extra'] ?? null) ?   strtoupper($config['extra']): null;
 
 		//	...
-		return "ALTER TABLE $database.$table $verb $common $extra $first $after $index";
+		return "ALTER TABLE $database.$table $verb $field $extra $first $after $index";
 	}
 
 	/** Generate Alter PostgreSQL.
@@ -339,17 +339,9 @@ class Column
 
 			//	...
 			case 'TIMESTAMP':
-				//	...
-				if( 'CURRENT_TIMESTAMP' === strtoupper($config['default']) ){
-					$null    = null;
-					$default = null;
-				};
-
-				//	...
-				if( $null !== 'NULL' and $default === null ){
-					$default = 'DEFAULT CURRENT_TIMESTAMP';
-					$extra   = 'ON UPDATE CURRENT_TIMESTAMP';
-				};
+				$null    = 'NOT NULL';
+				$default = 'DEFAULT CURRENT_TIMESTAMP';
+				$extra   = 'ON UPDATE CURRENT_TIMESTAMP';
 			break;
 
 			default:
