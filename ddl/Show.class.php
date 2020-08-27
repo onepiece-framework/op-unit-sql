@@ -283,7 +283,20 @@ class Show implements IF_SQL_DDL_SHOW
 	 */
 	public function Password(array $config=[])
 	{
+		//	...
 		$password = $this->_DB->PDO()->Quote($config['password']);
-		return "SELECT PASSWORD({$password})";
+
+		//	...
+		$version = $this->_DB->Version();
+
+		//	...
+		if( version_compare($version, '5.7.0') >= 0) {
+			$sql = "SELECT CONCAT('*', UPPER(SHA1(UNHEX(SHA1({$password})))))";
+		}else{
+			$sql = "SELECT PASSWORD({$password})";
+		}
+
+		//	...
+		return $sql;
 	}
 }
