@@ -248,10 +248,17 @@ class Show implements IF_SQL_DDL_SHOW
 		//	...
 		switch( $prod = $this->_DB->Config()['prod'] ){
 			case 'mysql':
-				//	MySQL 5.6
-				$sql = "SELECT `host`, `user`, `password` FROM `mysql`.`user`";
-				//	MySQL 5.7
-				//	$sql = "SELECT `host`, `user`             FROM `mysql`.`user`";
+				//	...
+				$version = $this->_DB->Version();
+
+				//	...
+				if( version_compare($version, '5.7.0') >= 0) {
+					//	MySQL 5.7.0 higher
+					$sql = "SELECT `host`, `user`, `authentication_string` as 'password' FROM `mysql`.`user`";
+				}else{
+					//	MySQL 5.7.0 under
+					$sql = "SELECT `host`, `user`, `password` FROM `mysql`.`user`";
+				}
 				break;
 
 			case 'pgsql':
