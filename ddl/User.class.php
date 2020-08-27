@@ -112,12 +112,20 @@ class User
 		}
 
 		//	...
+		$version = $this->_DB->Version();
 		$host	 = $this->_DB->PDO()->Quote($host);
 		$user	 = $this->_DB->PDO()->Quote($user);
 		$password= $this->_DB->PDO()->Quote($password);
 
-		//		SET PASSWORD FOR  'user'@'host'  = '***';
-		return "SET PASSWORD FOR {$user}@{$host} = PASSWORD({$password})";
+		//	...
+		if( version_compare($version, '5.7.0') >= 0) {
+			$sql = "ALTER USER {$user}@{$host} identified BY {$password}";
+		}else{
+			$sql = "SET PASSWORD FOR {$user}@{$host} = PASSWORD({$password})";
+		}
+
+		//	...
+		return $sql;
 	}
 
 	/** Drop user.
