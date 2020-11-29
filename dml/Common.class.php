@@ -387,6 +387,10 @@ class Common
 				if( $str === null ){
 					$str = " $key is null ";
 				}else{
+					if(!is_string($str) and !is_int($str) ){
+						D($str);
+						throw new \Exception("Arguments is not string. ($key)");
+					}
 					$str = " $key = $str ";
 				};
 			};
