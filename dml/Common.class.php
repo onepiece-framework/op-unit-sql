@@ -554,7 +554,12 @@ class Common
 		//	...
 		foreach( $order as $value ){
 			//	...
-			list($field, $order) = explode(' ', trim($value).' ');
+			list($field, $aorde) = explode(' ', trim($value).' ');
+
+			//	...
+			if( empty($field) ){
+				continue;
+			}
 
 			//	...
 			if( strpos($field, '.') ){
@@ -567,7 +572,7 @@ class Common
 			};
 
 			//	...
-			$field .= $order === 'desc' ? ' DESC':'';
+			$field .= $aorde === 'desc' ? ' DESC':'';
 
 			//	...
 			$join[] = $field;
