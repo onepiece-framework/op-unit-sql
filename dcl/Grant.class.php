@@ -117,7 +117,7 @@ class Grant
 		$privileges = join(', ', $join);
 
 		//	...
-		if( strlen($user) > 16 ){
+		if( strlen($user)-2 > 16 ){
 			throw new Exception("User name is too long. (Maximum 16 character: $user)");
 		}
 
