@@ -118,8 +118,13 @@ class User
 		$password= $this->_DB->PDO()->Quote($password);
 
 		//	...
+		if( $this->_DB->isMariaDB() ){
+			$version = 1;
+		}
+
+		//	...
 		if( version_compare($version, '5.7.0') >= 0) {
-			$sql = "ALTER USER {$user}@{$host} identified BY {$password}";
+			$sql = "ALTER USER {$user}@{$host} IDENTIFIED BY {$password}";
 		}else{
 			$sql = "SET PASSWORD FOR {$user}@{$host} = PASSWORD({$password})";
 		}
