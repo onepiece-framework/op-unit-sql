@@ -388,8 +388,9 @@ class Common
 					$str = " $key is null ";
 				}else{
 					if(!is_string($str) and !is_int($str) ){
-						D($str);
-						throw new \Exception("Arguments is not string. ($key)");
+						$type = gettype($str);
+						$json = json_encode($str);
+						throw new \Exception("Arguments is not string. ($key, $type, $json)");
 					}
 					$str = " $key = $str ";
 				};
