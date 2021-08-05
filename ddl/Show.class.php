@@ -252,6 +252,11 @@ class Show implements IF_SQL_DDL_SHOW
 				$version = $this->_DB->Version();
 
 				//	...
+				if( $this->_DB->isMariaDB() ){
+					$version = 1;
+				}
+
+				//	...
 				if( version_compare($version, '5.7.0') >= 0) {
 					//	MySQL 5.7.0 higher
 					$sql = "SELECT `host`, `user`, `authentication_string` as 'password' FROM `mysql`.`user`";
@@ -259,6 +264,11 @@ class Show implements IF_SQL_DDL_SHOW
 					//	MySQL 5.7.0 under
 					$sql = "SELECT `host`, `user`, `password` FROM `mysql`.`user`";
 				}
+
+				/*
+				//	...
+				$sql = "SELECT `host`, `user`, `password`, `authentication_string` FROM `mysql`.`user`";
+				*/
 				break;
 
 			case 'pgsql':
@@ -288,6 +298,11 @@ class Show implements IF_SQL_DDL_SHOW
 
 		//	...
 		$version = $this->_DB->Version();
+
+		//	...
+		if( $this->_DB->isMariaDB() ){
+			$version = 1;
+		}
 
 		//	...
 		if( version_compare($version, '5.7.0') >= 0) {
